@@ -82,3 +82,87 @@ function getRandomEventByType(type) {
             return null;
     }
 }
+
+
+//イベントの効果
+function applyEvent(player, event) {
+    switch (event) {
+        // レッスン系
+        case "vocal_lesson":
+            changeSkillLevel(player, "vocal", 20);
+            break;
+        case "dance_lesson":
+            changeSkillLevel(player, "dance", 20);
+            break;
+        case "visual_lesson":
+            changeSkillLevel(player, "visual", 20);
+            break;
+        case "select_lesson":
+            // とりあえずランダムにしておく（後でUIで選択できるようにする）
+            const skills = ["vocal", "dance", "visual"];
+            const randomSkill = skills[Math.floor(Math.random() * skills.length)];
+            changeSkillLevel(player, randomSkill, 20);
+            break;
+        
+        // ファン獲得系
+        case "live_stream":
+            changeFans(player, 20);
+            break;
+        case "sns_post":
+            changeFans(player, 15);
+            break;
+        case "street_live":
+            changeFans(player, 25);
+            break;
+        case "audition":
+            changeFans(player, 30);
+            break;
+        case "local_event":
+            changeFans(player, 10);
+            break;
+        case "sns_viral":
+            changeFans(player, 50);
+            break;
+        
+        // トラブル系
+        case "leg_injury":
+            changeSkillLevel(player, "dance", -10);
+            break;
+        case "throat_injury":
+            changeSkillLevel(player, "vocal", -10);
+            break;
+        case "romance":
+            changeFans(player, -20);
+            break;
+        case "account_hacked":
+            changeFans(player, -30);
+            break;
+        case "flaming_sns":
+            changeFans(player, -25);
+            break;
+        case "private_account_leak":
+            changeFans(player, -15);
+            break;
+        case "weight_gain":
+            changeSkillLevel(player, "visual", -10);
+            break;
+    }
+}
+
+function changeSkillLevel(player, skill, amount){
+    player.skills[skill] += amount;
+
+    if(player.skills[skill] > 100) {
+        player.skills[skill] = 100;
+    } else if(player.skills[skill] < 0) {
+        player.skills[skill] = 0;
+    }
+}
+
+function changeFans(player, amount) {
+    player.fans += amount;
+
+    if(player.fans < 0) {
+        player.fans = 0;
+    }
+}
