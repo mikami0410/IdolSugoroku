@@ -10,7 +10,8 @@ const sockets = {};
 const playerRooms = {};
 const {
   board,
-  getRandomEventByType
+  getRandomEventByType,
+  applyEvent
 } = require("./game-system");
 
 console.log("WebSocketサーバーを起動しました");
@@ -88,8 +89,8 @@ server.on("connection", (socket) => {
         position: 0,
         finished: false,
         skills: {
-          singing: 0,
-          dancing: 0,
+          vocal: 0,
+          dance: 0,
           visual: 0
         }
       };
@@ -314,7 +315,16 @@ server.on("connection", (socket) => {
         cell.type === "trouble"
       ) {
         event = getRandomEventByType(cell.type);
+
+        console.log("イベント前:", player);
+
+        if (event) {
+          applyEvent(player, event);
+        }
       }
+
+      console.log("イベント:", event);
+      console.log("イベント後:", player);
 
 
       console.log(
