@@ -3,13 +3,15 @@ const WebSocket = require("ws");
 const socket = new WebSocket("ws://localhost:8080");
 
 let playerId;
+let currentTurn = null;
+let finished = false;
 
 socket.on("open", () => {
   console.log("サーバーに接続しました");
 
   socket.send(JSON.stringify({
     type: "join",
-    name: "はなこ",
+    name: "じろう",
     roomId: "room1"
   }));
 });
@@ -24,6 +26,12 @@ socket.on("message", (message) => {
     playerId = data.playerId;
 
     console.log("自分のプレイヤーID:", playerId);
+
+    if (playerId === 3) {
+      socket.send(JSON.stringify({
+        type: "start_game"
+      }));
+    }
   }
 
   // プレイヤー参加
@@ -76,13 +84,15 @@ socket.on("message", (message) => {
   // ターン変更
   if (data.type === "turn_changed") {
 
+    currentTurn = data.playerId;
+
     console.log(
       "現在のターン:",
       data.playerName
     );
 
     if (data.playerId === playerId) {
-      console.log("自分のターン");
+      console.log("自分のターンです");
     } else {
       console.log(data.playerName + "が操作中");
     }
@@ -113,7 +123,16 @@ socket.on("message", (message) => {
   if (data.type === "game_state") {
     console.log("現在のゲーム状態:");
     console.log(data.state);
-  } 
+
+    const me = data.state.players.find(
+      (player) => player.id === playerId
+    );
+
+    if (me) {
+      finished = me.finished;
+    }
+  }
+
 
   //エラー
   if (data.type === "error") {
@@ -122,18 +141,38 @@ socket.on("message", (message) => {
 
   //マス
   if (data.type === "cell_event") {
-  console.log(
-    data.playerName,
-    "が",
-    data.cell.position,
-    "番目のマスに止まりました"
-  );
+    console.log(
+      data.playerName,
+      "が",
+      data.cell.position,
+      "番目のマスに止まりました"
+    );
 
-  console.log(
-    "マスの種類:",
-    data.cell.type
-  );
-}
+    console.log(
+      "マスの種類:",
+      data.cell.type
+    );
+
+    console.log(
+      "発生イベント:",
+      data.event
+    );
+  }
+  if (data.type === "game_finished") {
+    console.log("==========");
+    console.log("ゲーム終了！");
+    console.log("結果発表");
+    console.log("==========");
+
+    data.ranking.forEach((player) => {
+      console.log(
+        player.rank + "位:",
+        player.playerName,
+        "ファン数:",
+        player.fans
+      );
+    });
+  }
 });
 
 process.stdin.setRawMode(true);
@@ -143,6 +182,17 @@ process.stdin.setEncoding("utf8");
 process.stdin.on("data", (key) => {
 
   if (key === "\r") {
+
+    if (finished) {
+      console.log("すでにゴールしています");
+      return;
+    }
+
+    if (currentTurn !== playerId) {
+      console.log("あなたのターンではありません");
+      return;
+    }
+
     console.log("サイコロを振ります");
 
     socket.send(JSON.stringify({
@@ -150,8 +200,8 @@ process.stdin.on("data", (key) => {
     }));
   }
 
+
   if (key === "\u0003") {
     process.exit();
   }
 });
-

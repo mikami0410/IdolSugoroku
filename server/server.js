@@ -6,40 +6,12 @@ let nextPlayerId = 1;
 
 const players = {};
 const rooms = {};
-const board = [
-  { position: 1, type: "start" },
-  { position: 2, type: "event" },
-  { position: 3, type: "event" },
-  { position: 4, type: "event" },
-  { position: 5, type: "event" },
-  { position: 6, type: "event" },
-  { position: 7, type: "event" },
-  { position: 8, type: "event" },
-  { position: 9, type: "event" },
-  { position: 10, type: "event" },
-  { position: 11, type: "event" },
-  { position: 12, type: "event" },
-  { position: 13, type: "event" },
-  { position: 14, type: "event" },
-  { position: 15, type: "event" },
-  { position: 16, type: "event" },
-  { position: 17, type: "event" },
-  { position: 18, type: "event" },
-  { position: 19, type: "event" },
-  { position: 20, type: "event" },
-  { position: 21, type: "event" },
-  { position: 22, type: "event" },
-  { position: 23, type: "event" },
-  { position: 24, type: "event" },
-  { position: 25, type: "event" },
-  { position: 26, type: "event" },
-  { position: 27, type: "event" },
-  { position: 28, type: "event" },
-  { position: 29, type: "event" },
-  { position: 30, type: "goal" }
-];
 const sockets = {};
 const playerRooms = {};
+const {
+  board,
+  getRandomEventByType
+} = require("./game-system");
 
 console.log("WebSocketサーバーを起動しました");
 
@@ -72,6 +44,25 @@ function getBoardCell(position) {
   return board.find((cell) => cell.position === position);
 }
 
+function createRanking(room) {
+  const ranking = room.players.map((playerId) => {
+    const player = players[playerId];
+
+    return {
+      playerId: player.id,
+      playerName: player.name,
+      fans: player.fans
+    };
+  });
+
+  ranking.sort((a, b) => b.fans - a.fans);
+
+  ranking.forEach((player, index) => {
+    player.rank = index + 1;
+  });
+
+  return ranking;
+}
 
 server.on("connection", (socket) => {
   console.log("クライアントが接続しました");
@@ -265,6 +256,16 @@ server.on("connection", (socket) => {
         return;
       }
 
+      if (player.finished) {
+        socket.send(JSON.stringify({
+          type: "error",
+          message: "すでにゴールしています"
+        }));
+
+        return;
+      }
+
+
       if (room.currentTurn !== playerId) {
 
         socket.send(JSON.stringify({
@@ -284,7 +285,33 @@ server.on("connection", (socket) => {
         player.finished = true;
       }
 
+      const allFinished = room.players.every(
+        (id) => players[id].finished
+      );
+
+      if (allFinished) {
+        const ranking = createRanking(room);
+
+        broadcastToRoom(roomId, {
+          type: "game_finished",
+          ranking: ranking
+        });
+
+        return;
+      }
+
       const cell = getBoardCell(player.position);
+
+      let event = null;
+
+      if (
+        cell.type === "skill" ||
+        cell.type === "fan" ||
+        cell.type === "trouble"
+      ) {
+        event = getRandomEventByType(cell.type);
+      }
+
 
       console.log(
         "止まったマス:",
@@ -295,7 +322,8 @@ server.on("connection", (socket) => {
         type: "cell_event",
         playerId: playerId,
         playerName: player.name,
-        cell: cell
+        cell: cell,
+        event: event
       });
 
       console.log(
@@ -331,8 +359,15 @@ server.on("connection", (socket) => {
       const currentIndex =
         room.turnOrder.indexOf(playerId);
 
-      const nextIndex =
+      let nextIndex =
         (currentIndex + 1) % room.turnOrder.length;
+
+      while (
+        players[room.turnOrder[nextIndex]].finished
+      ) {
+        nextIndex =
+          (nextIndex + 1) % room.turnOrder.length;
+      }
 
       room.currentTurn =
         room.turnOrder[nextIndex];

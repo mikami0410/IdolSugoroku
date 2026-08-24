@@ -11,7 +11,7 @@ socket.on("open", () => {
 
   socket.send(JSON.stringify({
     type: "join",
-    name: "たろう",
+    name: "はなこ",
     roomId: "room1"
   }));
 });
