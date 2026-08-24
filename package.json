@@ -1,0 +1,24 @@
+{
+  "name": "idolsugoroku",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mikami0410/IdolSugoroku.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/mikami0410/IdolSugoroku/issues"
+  },
+  "homepage": "https://github.com/mikami0410/IdolSugoroku#readme",
+  "dependencies": {
+    "ws": "^8.21.3"
+  }
+}
