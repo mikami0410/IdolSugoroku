@@ -1,0 +1,28 @@
+{
+    "name": "idolsugoroku",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "dev": "vite"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/mikami0410/IdolSugoroku.git"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/mikami0410/IdolSugoroku/issues"
+    },
+    "homepage": "https://github.com/mikami0410/IdolSugoroku#readme",
+    "dependencies": {
+        "three": "^0.185.1"
+    },
+    "devDependencies": {
+        "@types/three": "^0.185.4",
+        "typescript": "^7.0.2",
+        "vite": "^8.2.2"
+    }
+}
