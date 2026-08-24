@@ -166,3 +166,16 @@ function changeFans(player, amount) {
         player.fans = 0;
     }
 }
+
+function getSkillRank(value) {
+    const ranks = ["C", "B", "A", "S"];
+    if (value >= 100) {
+        return ranks[3]; // Sランク
+    } else if (value >= 67) {
+        return ranks[2]; // Aランク
+    } else if (value >= 34) {
+        return ranks[1]; // Bランク
+    } else {
+        return ranks[0]; // Cランク
+    }
+}
