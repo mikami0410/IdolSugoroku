@@ -15,6 +15,7 @@ const {
 
 console.log("WebSocketサーバーを起動しました");
 
+// 指定したルームに接続している全プレイヤーへメッセージを送信
 function broadcastToRoom(roomId, message) {
   const room = rooms[roomId];
 
@@ -31,6 +32,7 @@ function broadcastToRoom(roomId, message) {
   }
 }
 
+// 現在のゲーム状態を取得
 function createGameState(room) {
   return {
     gameStarted: room.gameStarted,
@@ -40,10 +42,12 @@ function createGameState(room) {
   };
 }
 
+// プレイヤーの現在位置に対応するマスの情報を取得
 function getBoardCell(position) {
   return board.find((cell) => cell.position === position);
 }
 
+// ルーム内のプレイヤーをファン数の多い順に並べてランキングを作成
 function createRanking(room) {
   const ranking = room.players.map((playerId) => {
     const player = players[playerId];
