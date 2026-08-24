@@ -6,7 +6,7 @@
 npm install ws
 ```
 
-###UIのinportエラーをなくすとき
+###UIのimportエラーをなくすとき
 ```
 npm install three
 ```
