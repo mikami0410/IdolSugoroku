@@ -5,3 +5,8 @@
 ```
 npm install ws
 ```
+
+###UIのinportエラーをなくすとき
+```
+npm install three
+```
