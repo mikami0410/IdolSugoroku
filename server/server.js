@@ -79,6 +79,29 @@ server.on("connection", (socket) => {
 
     //ルーム参加
     if (data.type === "join") {
+      if (
+        typeof data.name !== "string" ||
+        typeof data.roomId !== "string" ||
+        data.name.trim() === "" ||
+        data.roomId.trim() === ""
+      ) {
+        socket.send(JSON.stringify({
+          type: "error",
+          message: "プレイヤー名とルームIDを入力してください"
+        }));
+
+        return;
+      }
+
+      if (socket.playerId) {
+        socket.send(JSON.stringify({
+          type: "error",
+          message: "すでにルームに参加しています"
+        }));
+
+        return;
+      }
+
       const playerId = nextPlayerId;
       nextPlayerId++;
 
@@ -107,10 +130,21 @@ server.on("connection", (socket) => {
           orderRolls: {},
           turnOrder: [],
           gameStarted: false,
+          gameStarting: false,
         };
       }
 
       const room = rooms[data.roomId];
+
+      if (room.players.length >= 4) {
+        socket.send(JSON.stringify({
+          type: "error",
+          message: "このルームは満員です"
+        }));
+
+        return;
+      }
+
       room.players.push(playerId);
 
       console.log("現在のルーム:", rooms);
@@ -142,9 +176,20 @@ server.on("connection", (socket) => {
         return;
       }
 
-      if (room.gameStarted) {
+      if (room.players.length < 2) {
+        socket.send(JSON.stringify({
+          type: "error",
+          message: "ゲームを開始するには2人以上必要です"
+        }));
+
         return;
       }
+
+      if (room.gameStarted || room.gameStarting) {
+        return;
+      }
+
+      room.gameStarting = true;
 
       console.log(
         "ゲーム開始:",
@@ -470,6 +515,25 @@ server.on("connection", (socket) => {
     room.players = room.players.filter(
       (id) => id !== playerId
     );
+
+    room.turnOrder = room.turnOrder.filter(
+      (id) => id !== playerId
+    );
+
+    if (room.currentTurn === playerId) {
+      const nextPlayerId = room.turnOrder[0];
+
+      room.currentTurn = nextPlayerId ?? null;
+
+      if (nextPlayerId) {
+        broadcastToRoom(roomId, {
+          type: "turn_changed",
+          playerId: nextPlayerId,
+          playerName: players[nextPlayerId].name
+        });
+      }
+    }
+
 
     broadcastToRoom(roomId, {
       type: "player_left",
