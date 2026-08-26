@@ -73,9 +73,29 @@ server.on("connection", (socket) => {
   console.log("クライアントが接続しました");
 
   socket.on("message", (message) => {
-    const data = JSON.parse(message.toString());
+    let data;
+
+    try {
+      data = JSON.parse(message.toString());
+    } catch (error) {
+      socket.send(JSON.stringify({
+        type: "error",
+        message: "不正なデータです"
+      }));
+
+      return;
+    }
 
     console.log("受信したデータ:", data);
+
+    if (typeof data.type !== "string") {
+      socket.send(JSON.stringify({
+        type: "error",
+        message: "メッセージのtypeが指定されていません"
+      }));
+
+      return;
+    }
 
     //ルーム参加
     if (data.type === "join") {
