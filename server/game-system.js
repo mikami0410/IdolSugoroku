@@ -179,3 +179,9 @@ function getSkillRank(value) {
         return ranks[0]; // Cランク
     }
 }
+
+module.exports = {
+    board,
+    getRandomEventByType,
+    applyEvent
+};

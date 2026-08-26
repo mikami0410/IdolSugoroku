@@ -10,7 +10,8 @@ const sockets = {};
 const playerRooms = {};
 const {
   board,
-  getRandomEventByType
+  getRandomEventByType,
+  applyEvent
 } = require("./game-system");
 
 console.log("WebSocketサーバーを起動しました");
@@ -85,11 +86,11 @@ server.on("connection", (socket) => {
         id: playerId,
         name: data.name,
         fans: 0,
-        position: 0,
+        position: 1,
         finished: false,
         skills: {
-          singing: 0,
-          dancing: 0,
+          vocal: 0,
+          dance: 0,
           visual: 0
         }
       };
@@ -212,6 +213,36 @@ server.on("connection", (socket) => {
           };
         });
 
+        const valueCount = {};
+
+        for (const result of results) {
+          valueCount[result.value] =
+            (valueCount[result.value] || 0) + 1;
+        }
+
+        const duplicatePlayers = results.filter(
+          (result) => valueCount[result.value] > 1
+        );
+
+        if (duplicatePlayers.length > 0) {
+
+          console.log("同じ目がありました");
+          console.log("再度サイコロを振るプレイヤー:", duplicatePlayers);
+
+          for (const result of duplicatePlayers) {
+            delete room.orderRolls[result.playerId];
+          }
+
+          broadcastToRoom(roomId, {
+            type: "order_roll_start",
+            playerIds: duplicatePlayers.map(
+              (result) => result.playerId
+            )
+          });
+
+          return;
+        }
+
         results.sort((a, b) => b.value - a.value);
 
         console.log("順番決定結果:", results);
@@ -223,6 +254,7 @@ server.on("connection", (socket) => {
         room.currentTurn = room.turnOrder[0];
 
         room.gameStarted = true;
+
 
         broadcastToRoom(roomId, {
           type: "game_state",
@@ -306,6 +338,17 @@ server.on("connection", (socket) => {
 
       const cell = getBoardCell(player.position);
 
+      if (!cell) {
+        console.log("マスが見つかりません:", player.position);
+
+        socket.send(JSON.stringify({
+          type: "error",
+          message: "移動先のマスが見つかりません"
+        }));
+
+        return;
+      }
+
       let event = null;
 
       if (
@@ -314,7 +357,16 @@ server.on("connection", (socket) => {
         cell.type === "trouble"
       ) {
         event = getRandomEventByType(cell.type);
+
+        console.log("イベント前:", player);
+
+        if (event) {
+          applyEvent(player, event);
+        }
       }
+
+      console.log("イベント:", event);
+      console.log("イベント後:", player);
 
 
       console.log(

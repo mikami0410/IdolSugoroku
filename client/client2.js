@@ -5,6 +5,7 @@ const socket = new WebSocket("ws://localhost:8080");
 let playerId;
 let currentTurn = null;
 let finished = false;
+let orderRollReady = false;
 
 socket.on("open", () => {
   console.log("サーバーに接続しました");
@@ -39,12 +40,19 @@ socket.on("message", (message) => {
 
   //順番決定開始
   if (data.type === "order_roll_start") {
-    console.log("順番決定を開始します");
 
-    socket.send(JSON.stringify({
-      type: "order_roll"
-    }));
+    if (
+      data.playerIds &&
+      !data.playerIds.includes(playerId)
+    ) {
+      return;
+    }
+
+    orderRollReady = true;
+    
+    console.log("順番決定サイコロを振れます。Enterを押してください。");
   }
+
 
   // 順番決定サイコロ
   if (data.type === "order_roll_result") {
@@ -117,7 +125,7 @@ socket.on("message", (message) => {
   //ゲーム状態
   if (data.type === "game_state") {
     console.log("現在のゲーム状態:");
-    console.log(data.state);
+    console.log(JSON.stringify(data.state, null, 2));
 
     const me = data.state.players.find(
       (player) => player.id === playerId
@@ -180,6 +188,25 @@ process.stdin.on("data", (key) => {
 
   if (key === "\r") {
 
+    // =========================
+    // 順番決定サイコロ
+    // =========================
+    if (orderRollReady) {
+
+      console.log("順番決定サイコロを振ります");
+
+      socket.send(JSON.stringify({
+        type: "order_roll"
+      }));
+
+      orderRollReady = false;
+
+      return;
+    }
+
+    // =========================
+    // 通常のゲーム
+    // =========================
     if (finished) {
       console.log("すでにゴールしています");
       return;
@@ -197,9 +224,9 @@ process.stdin.on("data", (key) => {
     }));
   }
 
-
   if (key === "\u0003") {
     process.exit();
   }
 });
+
 
