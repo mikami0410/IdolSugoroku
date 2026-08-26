@@ -135,13 +135,13 @@ function applyEvent(player, event) {
             changeFans(player, -20);
             break;
         case "account_hacked":
-            changeFans(player, -30);
+            changeFans(player, -20);
             break;
         case "flaming_sns":
-            changeFans(player, -25);
+            changeFans(player, -50);
             break;
         case "private_account_leak":
-            changeFans(player, -15);
+            changeFans(player, -20);
             break;
         case "weight_gain":
             changeSkillLevel(player, "visual", -10);
