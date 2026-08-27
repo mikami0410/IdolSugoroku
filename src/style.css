@@ -1,10 +1,42 @@
+html,
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* ゲーム画面 */
+#game-container{
+    position: absolute;
+    width: 1280px;
+    height: 720px;
+
+    left: 50%;
+    top: 50%;
+
+    transform-origin: center center;
+    transform: translate(-50%, -50%) scale(var(--game-scale));
+    overflow: hidden;
+}
+
+/* Three.js用 */
+canvas {
+    display: block;
+    width: 1280px;
+    height: 720px;
+}
+
+/* ステータス */
 #status {
-    position: fixed;
+    position: absolute;
 
-    left: 40px;
-    bottom: 40px;
+    left: 30px;
+    bottom: 30px;
 
-    width: 500px;
+    width: 900px;
+    height: 150px;
 
     padding: 20px 30px;
 
@@ -19,19 +51,67 @@
 }
 
 .status-name {
-    font-size: 24px;
+    font-size: 30px;
     font-weight: bold;
     margin-bottom: 10px;
 }
 
 .status-fan {
-    font-size: 20px;
+    font-size: 25px;
     margin-bottom: 10px;
 }
 
 .status-parameter {
+    font-size: 25px;
     display: flex;
-    gap: 30px;
+    gap: 25px;
+}
 
-    font-size: 18px;
+.rank{
+    font-weight: bold;
+}
+
+.rank-C{
+    color: rgb(38, 156, 235);
+}
+.rank-B{
+    color: rgb(62, 227, 117);
+}
+.rank-A{
+    color: rgb(236, 218, 17);
+}
+.rank-S{
+    color: rgb(221, 19, 19);
+}
+
+/* マスの内容 */
+#masu{
+    position: absolute;
+
+    left: 30px;
+    bottom: 30px;
+
+    width: 900px;
+    height: 150px;
+
+    padding: 20px 30px;
+
+    background-color: white;
+
+    border: 2px solid black;
+    border-radius: 10px;
+
+    font-family: sans-serif;
+
+    z-index: 100;
+}
+
+.masu-title{
+    font-size: 30px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.masu-description{
+    font-size: 20px;
 }

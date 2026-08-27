@@ -15,15 +15,17 @@ export enum EventType {
 
 export class Masu {
     private eventType: EventType;
-    private discription: string;
+    private eventTitle: string;
+    private description: string;
     private positionX: number;
     private positionZ: number;
 
-    private object!: THREE.Object3D;
+    private masu!: THREE.Object3D;
 
-    constructor(eventType: EventType, discription: string, positionX: number, positionZ: number) {
+    constructor(eventType: EventType, eventTitle: string, discription: string, positionX: number, positionZ: number) {
         this.eventType = eventType;
-        this.discription = discription;
+        this.eventTitle = eventTitle;
+        this.description = discription;
         this.positionX = positionX;
         this.positionZ = positionZ;
     }
@@ -32,8 +34,8 @@ export class Masu {
         const loder = new GLTFLoader();
         const modelPath = this.getModelPath();
         loder.load(modelPath, (gltf) => {
-            this.object = gltf.scene;
-            this.object.traverse((child) => {
+            this.masu = gltf.scene;
+            this.masu.traverse((child) => {
                 if (!(child instanceof THREE.Mesh)) {
                     return;
                 }
@@ -48,8 +50,9 @@ export class Masu {
                     map: texture
                 })
             });
-            this.object.position.set(this.positionX, 0, this.positionZ);
-            scene.add(this.object);
+            this.masu.position.set(this.positionX, 0, this.positionZ);
+            this.masu.scale.set(10, 10, 10);
+            scene.add(this.masu);
             console.log("マスを追加");
         });
     }
@@ -66,14 +69,18 @@ export class Masu {
     }
 
     public getObject(): THREE.Object3D {
-        return this.object;
+        return this.masu;
     }
 
     public getEventType(): EventType {
         return this.eventType;
     }
 
+    public getEventTitle(): string{
+        return this.eventTitle;
+    }
+
     public getDiscription(): string {
-        return this.discription;
+        return this.description;
     }
 }
