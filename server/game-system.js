@@ -32,7 +32,7 @@ const board = [
     { number: 17, type: 2 }, // dance lesson
     { number: 18, type: 6 }, // visual fan
     { number: 19, type: 7 }, // trouble
-    { number: 20, type: 1 }, // vocal lesson
+    { number: 20, type: 1 }, // 強制イベント予定
 
     { number: 21, type: 4 }, // vocal fan
     { number: 22, type: 7 }, // trouble
