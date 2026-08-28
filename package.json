@@ -18,7 +18,8 @@
     },
     "homepage": "https://github.com/mikami0410/IdolSugoroku#readme",
     "dependencies": {
-        "three": "^0.185.1"
+        "three": "^0.185.1",
+        "ws": "^8.21.3"
     },
     "devDependencies": {
         "@types/three": "^0.185.4",

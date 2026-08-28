@@ -5,12 +5,14 @@ export enum EventType {
     VOCAL_LESSON = 1,
     DANCE_LESSON = 2,
     VISUAL_LESSON = 3,
-    VOCAL_FAN = 4,
-    DANCE_FAN = 5,
-    VISUAL_FAN = 6,
-    TROUBLE = 7,
-    START = 8,
-    GOAL = 9
+    SELECT_LESSON = 4,
+    VOCAL_FAN = 5,
+    DANCE_FAN = 6,
+    VISUAL_FAN = 7,
+    TROUBLE = 8,
+    ORDITION = 9,
+    START = 10,
+    GOAL = 11
 }
 
 export class Masu {

@@ -6,6 +6,8 @@ import { roadDirection } from "./Positions";
 import { Player } from "./Player";
 import { StatusDisplay } from "./StatusDisplay";
 import { DescriptionDisplay } from "./DescriptionDisplay";
+import { Dice } from "./Dice";
+import { DiceButton } from "./DiceButton";
 import "./style.css";
 
 // プレイヤー
@@ -109,6 +111,10 @@ renderer.domElement.addEventListener("click", () => {
     }
     a++;
 });
+
+// さいころ
+const dice = new Dice(scene);
+const diceButton = new DiceButton(dice);
 
 // 描画
 
