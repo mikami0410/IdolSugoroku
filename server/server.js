@@ -2,9 +2,6 @@ const WebSocket = require("ws");
 
 const server = new WebSocket.Server({ port: 8080 });
 
-let nextPlayerId = 1;
-
-const players = {};
 const rooms = {};
 const sockets = {};
 const playerRooms = {};
@@ -13,6 +10,13 @@ const {
   getRandomEventByType,
   applyEvent
 } = require("./game-system");
+
+const {
+  createPlayer,
+  getPlayer,
+  removePlayer,
+  getPlayers
+} = require("./player");
 
 console.log("WebSocketサーバーを起動しました");
 
@@ -39,19 +43,19 @@ function createGameState(room) {
     gameStarted: room.gameStarted,
     currentTurn: room.currentTurn,
     turnOrder: room.turnOrder,
-    players: room.players.map((playerId) => players[playerId])
+    players: room.players.map((playerId) => getPlayer(playerId))
   };
 }
 
 // プレイヤーの現在位置に対応するマスの情報を取得
 function getBoardCell(position) {
-  return board.find((cell) => cell.position === position);
+  return board.find((cell) => cell.number === position);
 }
 
 // ルーム内のプレイヤーをファン数の多い順に並べてランキングを作成
 function createRanking(room) {
   const ranking = room.players.map((playerId) => {
-    const player = players[playerId];
+    const player = getPlayer(playerId);
 
     return {
       playerId: player.id,
@@ -122,27 +126,7 @@ server.on("connection", (socket) => {
         return;
       }
 
-      const playerId = nextPlayerId;
-      nextPlayerId++;
-
-      const player = {
-        id: playerId,
-        name: data.name,
-        fans: 0,
-        position: 1,
-        finished: false,
-        skills: {
-          vocal: 0,
-          dance: 0,
-          visual: 0
-        }
-      };
-
-      socket.playerId = playerId;
-      sockets[playerId] = socket;
-      players[playerId] = player;
-      playerRooms[playerId] = data.roomId;
-
+      // ルームが存在しなければ作成
       if (!rooms[data.roomId]) {
         rooms[data.roomId] = {
           players: [],
@@ -156,6 +140,7 @@ server.on("connection", (socket) => {
 
       const room = rooms[data.roomId];
 
+      // 満員チェック
       if (room.players.length >= 4) {
         socket.send(JSON.stringify({
           type: "error",
@@ -165,11 +150,19 @@ server.on("connection", (socket) => {
         return;
       }
 
+      // プレイヤーを作成
+      const player = createPlayer(data.name);
+      const playerId = player.id;
+
+      socket.playerId = playerId;
+      sockets[playerId] = socket;
+      playerRooms[playerId] = data.roomId;
+
       room.players.push(playerId);
 
       console.log("現在のルーム:", rooms);
       console.log("プレイヤーが参加しました:", player);
-      console.log("現在のプレイヤー:", players);
+      console.log("現在のプレイヤー:", getPlayers());
 
       socket.send(JSON.stringify({
         type: "player_info",
@@ -235,7 +228,7 @@ server.on("connection", (socket) => {
       }
 
       const playerId = socket.playerId;
-      const player = players[playerId];
+      const player = getPlayer(playerId);
       const roomId = playerRooms[playerId];
       const room = rooms[roomId];
 
@@ -319,7 +312,7 @@ server.on("connection", (socket) => {
         room.currentTurn = room.turnOrder[0];
 
         room.gameStarted = true;
-
+        room.gameStarting = false;
 
         broadcastToRoom(roomId, {
           type: "game_state",
@@ -335,7 +328,7 @@ server.on("connection", (socket) => {
         broadcastToRoom(roomId, {
           type: "turn_changed",
           playerId: room.currentTurn,
-          playerName: players[room.currentTurn].name
+          playerName: getPlayer(room.currentTurn).name
         });
       }
     }
@@ -348,7 +341,7 @@ server.on("connection", (socket) => {
       }
 
       const playerId = socket.playerId;
-      const player = players[playerId];
+      const player = getPlayer(playerId);
 
       const roomId = playerRooms[playerId];
       const room = rooms[roomId];
@@ -387,7 +380,7 @@ server.on("connection", (socket) => {
       }
 
       const allFinished = room.players.every(
-        (id) => players[id].finished
+        (id) => getPlayer(id).finished
       );
 
       if (allFinished) {
@@ -416,11 +409,7 @@ server.on("connection", (socket) => {
 
       let event = null;
 
-      if (
-        cell.type === "skill" ||
-        cell.type === "fan" ||
-        cell.type === "trouble"
-      ) {
+      if (cell.type >= 1 && cell.type <= 7) {
         event = getRandomEventByType(cell.type);
 
         console.log("イベント前:", player);
@@ -484,7 +473,7 @@ server.on("connection", (socket) => {
         (currentIndex + 1) % room.turnOrder.length;
 
       while (
-        players[room.turnOrder[nextIndex]].finished
+        getPlayer(room.turnOrder[nextIndex]).finished
       ) {
         nextIndex =
           (nextIndex + 1) % room.turnOrder.length;
@@ -501,7 +490,7 @@ server.on("connection", (socket) => {
       broadcastToRoom(roomId, {
         type: "turn_changed",
         playerId: room.currentTurn,
-        playerName: players[room.currentTurn].name
+        playerName: getPlayer(room.currentTurn).name
       });
 
       broadcastToRoom(roomId, {
@@ -525,7 +514,7 @@ server.on("connection", (socket) => {
     console.log("プレイヤーが切断しました:", playerId);
 
     delete sockets[playerId];
-    delete players[playerId];
+    removePlayer(playerId);
     delete playerRooms[playerId];
 
     if (!room) {
@@ -549,7 +538,7 @@ server.on("connection", (socket) => {
         broadcastToRoom(roomId, {
           type: "turn_changed",
           playerId: nextPlayerId,
-          playerName: players[nextPlayerId].name
+          playerName: getPlayer(nextPlayerId).name
         });
       }
     }
