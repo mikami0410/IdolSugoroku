@@ -47,17 +47,17 @@ socket.on("message", (message) => {
   //順番決定開始
   if (data.type === "order_roll_start") {
 
-  if (
-    data.playerIds &&
-    !data.playerIds.includes(playerId)
-  ) {
-    return;
-  }
+    if (
+      data.playerIds &&
+      !data.playerIds.includes(playerId)
+    ) {
+      return;
+    }
 
-  orderRollReady = true;
-  
-  console.log("順番決定サイコロを振れます。Enterを押してください。");
-}
+    orderRollReady = true;
+
+    console.log("順番決定サイコロを振れます。Enterを押してください。");
+  }
 
 
   // 順番決定サイコロ
@@ -172,14 +172,21 @@ socket.on("message", (message) => {
     console.log("結果発表");
     console.log("==========");
 
-    data.ranking.forEach((player) => {
-      console.log(
-        player.rank + "位:",
-        player.playerName,
-        "ファン数:",
-        player.fans
-      );
-    });
+
+    if (data.ranking) {
+      data.ranking.forEach((player) => {
+        console.log(
+          player.rank + "位:",
+          player.playerName,
+          "ファン数:",
+          player.fans
+        );
+      });
+    }
+
+    if (data.reason === "player_left") {
+      console.log("プレイヤーが退出したためゲーム終了です");
+    }
   }
 });
 

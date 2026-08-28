@@ -525,14 +525,32 @@ server.on("connection", (socket) => {
       (id) => id !== playerId
     );
 
-    room.turnOrder = room.turnOrder.filter(
-      (id) => id !== playerId
-    );
+    if (room.gameStarted && room.players.length === 1) {
+      room.gameStarted = false;
+      room.currentTurn = null;
+      room.turnOrder = [];
+
+      broadcastToRoom(roomId, {
+        type: "game_finished",
+        reason: "player_left"
+      });
+    }
+
+    if (room.players.length === 0) {
+      delete rooms[roomId];
+    }
 
     if (room.currentTurn === playerId) {
-      const nextPlayerId = room.turnOrder[0];
+      const currentIndex = room.turnOrder.indexOf(playerId);
 
-      room.currentTurn = nextPlayerId ?? null;
+      let nextPlayerId = null;
+
+      if (currentIndex !== -1 && room.turnOrder.length > 1) {
+        nextPlayerId =
+          room.turnOrder[(currentIndex + 1) % room.turnOrder.length];
+      }
+
+      room.currentTurn = nextPlayerId;
 
       if (nextPlayerId) {
         broadcastToRoom(roomId, {
@@ -543,6 +561,9 @@ server.on("connection", (socket) => {
       }
     }
 
+    room.turnOrder = room.turnOrder.filter(
+      (id) => id !== playerId
+    );
 
     broadcastToRoom(roomId, {
       type: "player_left",
