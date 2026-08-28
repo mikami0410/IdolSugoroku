@@ -2,9 +2,9 @@ const WebSocket = require("ws");
 
 const server = new WebSocket.Server({ port: 8080 });
 
-const rooms = {};
 const sockets = {};
 const playerRooms = {};
+
 const {
   board,
   getRandomEventByType,
@@ -18,11 +18,20 @@ const {
   getPlayers
 } = require("./player");
 
+const {
+  createRoom,
+  getRoom,
+  removeRoom,
+  addPlayerToRoom,
+  removePlayerFromRoom,
+  getRooms
+} = require("./room");
+
 console.log("WebSocketサーバーを起動しました");
 
 // 指定したルームに接続している全プレイヤーへメッセージを送信
 function broadcastToRoom(roomId, message) {
-  const room = rooms[roomId];
+  const room = getRoom(roomId);
 
   if (!room) {
     return;
@@ -126,23 +135,13 @@ server.on("connection", (socket) => {
         return;
       }
 
-      // ルームが存在しなければ作成
-      if (!rooms[data.roomId]) {
-        rooms[data.roomId] = {
-          players: [],
-          currentTurn: null,
-          orderRolls: {},
-          orderRollGroups: [],
-          orderRollCurrentGroup: [],
-          orderRollRerolling: false,
-          orderRollResults: {},
-          turnOrder: [],
-          gameStarted: false,
-          gameStarting: false,
-        };
-      }
+      // ルームを取得
+      let room = getRoom(data.roomId);
 
-      const room = rooms[data.roomId];
+      // ルームが存在しなければ作成
+      if (!room) {
+        room = createRoom(data.roomId);
+      }
 
       // 満員チェック
       if (room.players.length >= 4) {
@@ -162,9 +161,10 @@ server.on("connection", (socket) => {
       sockets[playerId] = socket;
       playerRooms[playerId] = data.roomId;
 
-      room.players.push(playerId);
+      // プレイヤーをルームに追加
+      addPlayerToRoom(data.roomId, playerId);
 
-      console.log("現在のルーム:", rooms);
+      console.log("現在のルーム:", getRooms());
       console.log("プレイヤーが参加しました:", player);
       console.log("現在のプレイヤー:", getPlayers());
 
@@ -187,7 +187,7 @@ server.on("connection", (socket) => {
 
       const playerId = socket.playerId;
       const roomId = playerRooms[playerId];
-      const room = rooms[roomId];
+      const room = getRoom(roomId);
 
       if (!room) {
         return;
@@ -234,7 +234,7 @@ server.on("connection", (socket) => {
       const playerId = socket.playerId;
       const player = getPlayer(playerId);
       const roomId = playerRooms[playerId];
-      const room = rooms[roomId];
+      const room = getRoom(roomId);
 
 
       if (!room) {
@@ -458,7 +458,7 @@ server.on("connection", (socket) => {
       const player = getPlayer(playerId);
 
       const roomId = playerRooms[playerId];
-      const room = rooms[roomId];
+      const room = getRoom(roomId);
 
       if (!room) {
         return;
@@ -623,7 +623,7 @@ server.on("connection", (socket) => {
     }
 
     const roomId = playerRooms[playerId];
-    const room = rooms[roomId];
+    const room = getRoom(roomId);
 
     console.log("プレイヤーが切断しました:", playerId);
 
@@ -635,9 +635,8 @@ server.on("connection", (socket) => {
       return;
     }
 
-    room.players = room.players.filter(
-      (id) => id !== playerId
-    );
+    //プレイヤーをルームから削除
+    removePlayerFromRoom(roomId, playerId);
 
     if (room.gameStarted && room.players.length === 1) {
       room.gameStarted = false;
@@ -651,7 +650,7 @@ server.on("connection", (socket) => {
     }
 
     if (room.players.length === 0) {
-      delete rooms[roomId];
+      removeRoom(roomId);
     }
 
     if (room.currentTurn === playerId) {
@@ -684,6 +683,6 @@ server.on("connection", (socket) => {
       playerId: playerId
     });
 
-    console.log("現在のルーム:", rooms);
+    console.log("現在のルーム:", getRooms());
   });
 });
