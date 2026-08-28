@@ -1,58 +1,87 @@
+// export enum EventType {
+//     VOCAL_LESSON = 1,
+//     DANCE_LESSON = 2,
+//     VISUAL_LESSON = 3,
+//     VOCAL_FAN = 4,
+//     DANCE_FAN = 5,
+//     VISUAL_FAN = 6,
+//     TROUBLE = 7,
+//     START = 8,
+//     GOAL = 9
+// }
+
 const board = [
-    { position: 1, type: "start" },
+    { number: 1, type: 8 }, // start
 
-    { position: 2, type: "skill" },
-    { position: 3, type: "skill" },
-    { position: 4, type: "fan" },
-    { position: 5, type: "skill" },
-    { position: 6, type: "fan" },
-    { position: 7, type: "trouble" },
-    { position: 8, type: "skill" },
-    { position: 9, type: "fan" },
-    { position: 10, type: "trouble" },
+    { number: 2, type: 1 }, // vocal lesson
+    { number: 3, type: 2 }, // dance lesson
+    { number: 4, type: 4 }, // vocal fan
+    { number: 5, type: 3 }, // visual lesson
+    { number: 6, type: 5 }, // dance fan
+    { number: 7, type: 7 }, // trouble
+    { number: 8, type: 3 }, // visual lesson
+    { number: 9, type: 6 }, // visual fan
+    { number: 10, type: 7 }, // trouble
 
-    { position: 11, type: "skill" },
-    { position: 12, type: "fan" },
-    { position: 13, type: "trouble" },
-    { position: 14, type: "skill" },
-    { position: 15, type: "fan" },
-    { position: 16, type: "skill" },
-    { position: 17, type: "skill" },
-    { position: 18, type: "fan" },
-    { position: 19, type: "trouble" },
-    { position: 20, type: "skill" },
+    { number: 11, type: 1 }, // vocal lesson
+    { number: 12, type: 4 }, // vocal fan
+    { number: 13, type: 7 }, // trouble
+    { number: 14, type: 2 }, // dance lesson
+    { number: 15, type: 5 }, // dance fan
+    { number: 16, type: 1 }, // vocal lesson
+    { number: 17, type: 2 }, // dance lesson
+    { number: 18, type: 6 }, // visual fan
+    { number: 19, type: 7 }, // trouble
+    { number: 20, type: 1 }, // vocal lesson
 
-    { position: 21, type: "fan" },
-    { position: 22, type: "trouble" },
-    { position: 23, type: "skill" },
-    { position: 24, type: "trouble" },
-    { position: 25, type: "fan" },
-    { position: 26, type: "trouble" },
-    { position: 27, type: "fan" },
-    { position: 28, type: "trouble" },
-    { position: 29, type: "fan" },
+    { number: 21, type: 4 }, // vocal fan
+    { number: 22, type: 7 }, // trouble
+    { number: 23, type: 3 }, // visual lesson
+    { number: 24, type: 7 }, // trouble
+    { number: 25, type: 5 }, // dance fan
+    { number: 26, type: 7 }, // trouble
+    { number: 27, type: 6 }, // visual fan
+    { number: 28, type: 7 }, // trouble
+    { number: 29, type: 4 }, // vocal fan
 
-    { position: 30, type: "goal" }
+    { number: 30, type: 9 } // goal
 ];
 
 
 // 各タイプのイベントの種類を定義
-const skillEvents = [
-    "vocal_lesson",
-    "dance_lesson",
-    "visual_lesson",
-    "select_lesson"
+// スキル系
+const vocalLessonEvents = [
+    "vocal_lesson"
 ];
 
-const fanEvents = [
-    "live_stream",
-    "sns_post",
-    "street_live",
-    "audition",
-    "local_event",
-    "sns_viral"
+const danceLessonEvents = [
+    "dance_lesson"
 ];
 
+const visualLessonEvents = [
+    "visual_lesson"
+];
+
+// ファン獲得系
+const vocalFanEvents = [
+    "singing_video",       // 歌ってみた動画の投稿
+    "street_live",         // 路上ライブ
+    "local_event"          // 地元のイベントに出演
+];
+
+const danceFanEvents = [
+    "dance_video",         // ダンス動画の投稿
+    "dance_competition",   // ダンス大会に出場
+    "back_dancer"          // 有名アーティストのバックダンサーをする
+];
+
+const visualFanEvents = [
+    "daily_photo",         // 日常写真の投稿
+    "street_snap",         // ストリートスナップに出会う
+    "live_stream"          // SNSでライブ配信をする
+];
+
+// トラブル系
 const troubleEvents = [
     "leg_injury",
     "throat_injury",
@@ -72,11 +101,19 @@ function getRandomEvent(events) {
 
 function getRandomEventByType(type) {
     switch (type) {
-        case "skill":
-            return getRandomEvent(skillEvents);
-        case "fan":
-            return getRandomEvent(fanEvents);
-        case "trouble":
+        case 1:
+            return getRandomEvent(vocalLessonEvents);
+        case 2:
+            return getRandomEvent(danceLessonEvents);
+        case 3:
+            return getRandomEvent(visualLessonEvents);
+        case 4:
+            return getRandomEvent(vocalFanEvents);
+        case 5:
+            return getRandomEvent(danceFanEvents);
+        case 6:
+            return getRandomEvent(visualFanEvents);
+        case 7:
             return getRandomEvent(troubleEvents);
         default:
             return null;
@@ -97,31 +134,34 @@ function applyEvent(player, event) {
         case "visual_lesson":
             changeSkillLevel(player, "visual", 20);
             break;
-        case "select_lesson":
-            // とりあえずランダムにしておく（後でUIで選択できるようにする）
-            const skills = ["vocal", "dance", "visual"];
-            const randomSkill = skills[Math.floor(Math.random() * skills.length)];
-            changeSkillLevel(player, randomSkill, 20);
-            break;
         
         // ファン獲得系
-        case "live_stream":
+        case "singing_video":
             changeFans(player, 20);
-            break;
-        case "sns_post":
-            changeFans(player, 15);
             break;
         case "street_live":
             changeFans(player, 25);
             break;
-        case "audition":
+        case "local_event":
             changeFans(player, 30);
             break;
-        case "local_event":
-            changeFans(player, 10);
+        case "dance_video":
+            changeFans(player, 20);
             break;
-        case "sns_viral":
-            changeFans(player, 50);
+        case "dance_competition":
+            changeFans(player, 30);
+            break;
+        case "back_dancer":
+            changeFans(player, 40);
+            break;
+        case "daily_photo":
+            changeFans(player, 15);
+            break;
+        case "street_snap":
+            changeFans(player, 30);
+            break;
+        case "live_stream":
+            changeFans(player, 25);
             break;
         
         // トラブル系
