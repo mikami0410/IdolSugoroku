@@ -132,6 +132,10 @@ server.on("connection", (socket) => {
           players: [],
           currentTurn: null,
           orderRolls: {},
+          orderRollGroups: [],
+          orderRollCurrentGroup: [],
+          orderRollRerolling: false,
+          orderRollResults: {},
           turnOrder: [],
           gameStarted: false,
           gameStarting: false,
@@ -244,6 +248,7 @@ server.on("connection", (socket) => {
       const dice = Math.floor(Math.random() * 6) + 1;
 
       room.orderRolls[playerId] = dice;
+      room.orderRollResults[playerId] = dice;
 
       console.log(
         "Player",
@@ -260,14 +265,21 @@ server.on("connection", (socket) => {
       });
 
 
-      if (Object.keys(room.orderRolls).length === room.players.length) {
+      if (
+        Object.keys(room.orderRolls).length ===
+        (
+          room.orderRollRerolling
+            ? room.orderRollGroups.flat().length
+            : room.players.length
+        )
+      ) {
 
         console.log("全員のサイコロが終了しました");
 
         const results = room.players.map((id) => {
           return {
             playerId: id,
-            value: room.orderRolls[id]
+            value: room.orderRollResults[id]
           };
         });
 
@@ -278,11 +290,91 @@ server.on("connection", (socket) => {
             (valueCount[result.value] || 0) + 1;
         }
 
-        const duplicatePlayers = results.filter(
-          (result) => valueCount[result.value] > 1
+        if (!room.orderRollRerolling) {
+          const sortedResults = [...results].sort(
+            (a, b) => b.value - a.value
+          );
+
+          const groups = [];
+          let currentGroup = [];
+          let currentValue = null;
+
+          for (const result of sortedResults) {
+            if (currentValue !== result.value) {
+              if (currentGroup.length > 0) {
+                groups.push(currentGroup);
+              }
+
+              currentGroup = [];
+              currentValue = result.value;
+            }
+
+            currentGroup.push(result.playerId);
+          }
+
+          if (currentGroup.length > 0) {
+            groups.push(currentGroup);
+          }
+
+          room.orderRollGroups = groups;
+        }
+
+
+        let duplicatePlayers = [];
+
+        if (!room.orderRollRerolling) {
+          duplicatePlayers = room.orderRollGroups
+            .filter((group) => group.length > 1)
+            .flat()
+            .map((playerId) => {
+              return {
+                playerId: playerId,
+                value: room.orderRolls[playerId]
+              };
+            });
+        }
+
+        if (room.orderRollRerolling) {
+          const group = room.orderRollCurrentGroup;
+
+          const groupValues = group.map(
+            (playerId) => room.orderRolls[playerId]
+          );
+
+          const valueCount = {};
+
+          for (const value of groupValues) {
+            valueCount[value] =
+              (valueCount[value] || 0) + 1;
+          }
+
+          const samePlayers = group.filter(
+            (playerId) =>
+              valueCount[room.orderRolls[playerId]] > 1
+          );
+
+          if (samePlayers.length > 0) {
+            duplicatePlayers = samePlayers.map((playerId) => {
+              return {
+                playerId: playerId,
+                value: room.orderRolls[playerId]
+              };
+            });
+          }
+        }
+
+        console.log(
+          "振り直し対象:",
+          duplicatePlayers.map((result) => result.playerId)
         );
 
+
         if (duplicatePlayers.length > 0) {
+          room.orderRollRerolling = true;
+
+          room.orderRollCurrentGroup = duplicatePlayers.map(
+            (result) => result.playerId
+          );
 
           console.log("同じ目がありました");
           console.log("再度サイコロを振るプレイヤー:", duplicatePlayers);
@@ -301,13 +393,35 @@ server.on("connection", (socket) => {
           return;
         }
 
-        results.sort((a, b) => b.value - a.value);
+        if (room.orderRollRerolling && duplicatePlayers.length === 0) {
+          room.orderRollRerolling = false;
+          room.orderRollCurrentGroup = [];
+        }
 
-        console.log("順番決定結果:", results);
+        // 最初に決まった順位グループを維持する
+        const groupedResults = [];
 
-        room.turnOrder = results.map(
+        for (const group of room.orderRollGroups) {
+          const groupResults = group.map((playerId) => {
+            return {
+              playerId: playerId,
+              value: room.orderRollResults[playerId]
+            };
+          });
+
+          // 同じ順位グループの中だけ、振り直し結果で並べる
+          groupResults.sort((a, b) => b.value - a.value);
+
+          groupedResults.push(...groupResults);
+        }
+
+        console.log("順番決定結果:", groupedResults);
+
+        room.turnOrder = groupedResults.map(
           (result) => result.playerId
         );
+
+        room.orderRollRerolling = false;
 
         room.currentTurn = room.turnOrder[0];
 
