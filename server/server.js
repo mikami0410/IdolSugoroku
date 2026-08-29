@@ -32,6 +32,10 @@ const {
   resolveOrder
 } = require("./order-system");
 
+const {
+  handleJoin
+} = require("./handlers/join-handler");
+
 console.log("WebSocketサーバーを起動しました");
 
 // 指定したルームに接続している全プレイヤーへメッセージを送信
@@ -117,70 +121,10 @@ server.on("connection", (socket) => {
 
     //ルーム参加
     if (data.type === "join") {
-      if (
-        typeof data.name !== "string" ||
-        typeof data.roomId !== "string" ||
-        data.name.trim() === "" ||
-        data.roomId.trim() === ""
-      ) {
-        socket.send(JSON.stringify({
-          type: "error",
-          message: "プレイヤー名とルームIDを入力してください"
-        }));
-
-        return;
-      }
-
-      if (socket.playerId) {
-        socket.send(JSON.stringify({
-          type: "error",
-          message: "すでにルームに参加しています"
-        }));
-
-        return;
-      }
-
-      // ルームを取得
-      let room = getRoom(data.roomId);
-
-      // ルームが存在しなければ作成
-      if (!room) {
-        room = createRoom(data.roomId);
-      }
-
-      // 満員チェック
-      if (room.players.length >= 4) {
-        socket.send(JSON.stringify({
-          type: "error",
-          message: "このルームは満員です"
-        }));
-
-        return;
-      }
-
-      // プレイヤーを作成
-      const player = createPlayer(data.name);
-      const playerId = player.id;
-
-      socket.playerId = playerId;
-      sockets[playerId] = socket;
-      playerRooms[playerId] = data.roomId;
-
-      // プレイヤーをルームに追加
-      addPlayerToRoom(data.roomId, playerId);
-
-      console.log("現在のルーム:", getRooms());
-      console.log("プレイヤーが参加しました:", player);
-      console.log("現在のプレイヤー:", getPlayers());
-
-      socket.send(JSON.stringify({
-        type: "player_info",
-        playerId: playerId
-      }));
-
-      broadcastToRoom(data.roomId, {
-        type: "player_joined",
-        player: player
+      handleJoin(socket, data, {
+        sockets,
+        playerRooms,
+        broadcastToRoom
       });
     }
 
