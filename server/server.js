@@ -272,7 +272,7 @@ server.on("connection", (socket) => {
         return;
       }
 
-      // サイコロを振る
+      // ルーレットを回す
       const result = rollOrder(playerId);
       const dice = result.value;
 
@@ -282,11 +282,11 @@ server.on("connection", (socket) => {
       console.log(
         "Player",
         playerId,
-        "の順番決定サイコロ:",
+        "の順番決定ルーレット:",
         dice
       );
 
-      // サイコロ結果を全員に通知
+      // ルーレット結果を全員に通知
       broadcastToRoom(roomId, {
         type: "order_roll_result",
         playerId: playerId,
@@ -294,7 +294,7 @@ server.on("connection", (socket) => {
         value: dice
       });
 
-      // 必要なプレイヤーが全員振ったか確認
+      // 必要なプレイヤーが全員回したか確認
       const requiredPlayers =
         room.orderRollRerolling
           ? room.orderRollCurrentGroup
@@ -309,7 +309,7 @@ server.on("connection", (socket) => {
         return;
       }
 
-      console.log("全員のサイコロが終了しました");
+      console.log("全員のルーレットが終了しました");
 
       // 結果を作る
       const results = room.players.map((id) => {
@@ -336,14 +336,14 @@ server.on("connection", (socket) => {
         room.orderRollGroups = orderResult.groups;
       }
 
-      // 振り直しが必要
+      // 回し直しが必要
       if (!orderResult.finished) {
 
         const duplicatePlayers =
           orderResult.duplicatePlayers;
 
         console.log(
-          "振り直し対象:",
+          "回し直し対象:",
           duplicatePlayers
         );
 
@@ -351,12 +351,12 @@ server.on("connection", (socket) => {
 
         room.orderRollCurrentGroup = duplicatePlayers;
 
-        // 振り直すプレイヤーの現在の出目を削除
+        // 回し直すプレイヤーの現在の結果を削除
         for (const duplicatePlayerId of duplicatePlayers) {
           delete room.orderRolls[duplicatePlayerId];
         }
 
-        // 振り直し対象者に通知
+        // 回し直し対象者に通知
         broadcastToRoom(roomId, {
           type: "order_roll_start",
           playerIds: duplicatePlayers
@@ -365,7 +365,7 @@ server.on("connection", (socket) => {
         return;
       }
 
-      // 振り直し不要 → 順番決定完了
+      // 回し直し不要 → 順番決定完了
       room.turnOrder =
         orderResult.turnOrder;
 
@@ -403,8 +403,8 @@ server.on("connection", (socket) => {
       });
     }
 
-    //サイコロ
-    if (data.type === "roll_dice") {
+    //ルーレット
+    if (data.type === "spin_roulette") {
 
       if (!socket.playerId) {
         return;
@@ -509,7 +509,7 @@ server.on("connection", (socket) => {
       console.log(
         "プレイヤー",
         playerId,
-        "のサイコロの目:",
+        "のルーレットの結果:",
         dice
       );
 
@@ -521,7 +521,7 @@ server.on("connection", (socket) => {
       );
 
       broadcastToRoom(roomId, {
-        type: "dice_result",
+        type: "roulette_result",
         playerId: playerId,
         playerName: player.name,
         value: dice

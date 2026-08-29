@@ -54,7 +54,7 @@ function createOrderGroups(results) {
   return groups;
 }
 
-// 振り直しが必要なプレイヤーを取得
+// 回し直しが必要なプレイヤーを取得
 function getDuplicatePlayers(group, results) {
   const groupValues = group.map(
     (playerId) => results[playerId]
@@ -73,7 +73,7 @@ function getDuplicatePlayers(group, results) {
   return duplicatePlayers;
 }
 
-// 全順位グループから振り直し対象を取得
+// 全順位グループから回し直し対象を取得
 //
 // 例:
 //
@@ -91,7 +91,7 @@ function getDuplicatePlayers(group, results) {
 //   5: 5
 // }
 //
-// この場合、[2, 3]だけが振り直し対象
+// この場合、[2, 3]だけが回し直し対象
 function getAllDuplicatePlayers(groups, results) {
   const duplicatePlayers = [];
 
@@ -155,7 +155,7 @@ function resolveOrder(results, groups = null) {
   if (duplicatePlayers.length > 0) {
     return {
       finished: false,                       // 順番決定が完了したかどうか
-      duplicatePlayers: duplicatePlayers,    // 振り直しが必要なプレイヤー
+      duplicatePlayers: duplicatePlayers,    // 回し直しが必要なプレイヤー
       groups: groups,                        // 現在の順位グループ
       turnOrder: null                        // 最終的なターン順
     };

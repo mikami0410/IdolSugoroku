@@ -56,14 +56,14 @@ socket.on("message", (message) => {
 
     orderRollReady = true;
 
-    console.log("順番決定サイコロを振れます。Enterを押してください。");
+    console.log("順番決定ルーレットを回せます。Enterを押してください。");
   }
 
 
-  // 順番決定サイコロ
+  // 順番決定ルーレット
   if (data.type === "order_roll_result") {
     console.log(
-      "順番決定サイコロ:",
+      "順番決定ルーレット:",
       data.playerName,
       data.value
     );
@@ -107,11 +107,11 @@ socket.on("message", (message) => {
   }
 
 
-  //サイコロ
-  if (data.type === "dice_result") {
+  //ルーレット
+  if (data.type === "roulette_result") {
     console.log(
       data.playerName,
-      "のサイコロの結果:",
+      "のルーレットの結果:",
       data.value
     );
   }
@@ -198,12 +198,10 @@ process.stdin.on("data", (key) => {
 
   if (key === "\r") {
 
-    // =========================
-    // 順番決定サイコロ
-    // =========================
+    // 順番決定ルーレット
     if (orderRollReady) {
 
-      console.log("順番決定サイコロを振ります");
+      console.log("順番決定ルーレットを回します");
 
       socket.send(JSON.stringify({
         type: "order_roll"
@@ -214,9 +212,7 @@ process.stdin.on("data", (key) => {
       return;
     }
 
-    // =========================
-    // 通常のゲーム
-    // =========================
+    // 通常のゲーム 
     if (finished) {
       console.log("すでにゴールしています");
       return;
@@ -227,10 +223,10 @@ process.stdin.on("data", (key) => {
       return;
     }
 
-    console.log("サイコロを振ります");
+    console.log("ルーレットを回します");
 
     socket.send(JSON.stringify({
-      type: "roll_dice"
+      type: "spin_roulette"
     }));
   }
 
