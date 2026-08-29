@@ -27,6 +27,11 @@ const {
   getRooms
 } = require("./room");
 
+const {
+  rollOrder,
+  resolveOrder
+} = require("./order-system");
+
 console.log("WebSocketサーバーを起動しました");
 
 // 指定したルームに接続している全プレイヤーへメッセージを送信
@@ -214,6 +219,18 @@ server.on("connection", (socket) => {
       );
 
       room.orderRolls = {};
+      room.orderRollResults = {};
+      room.orderRollGroups = [];
+      room.orderRollCurrentGroup = [];
+      room.orderRollRerolling = false;
+
+      console.log("順番決定データを初期化しました:", {
+        orderRolls: room.orderRolls,
+        orderRollResults: room.orderRollResults,
+        orderRollGroups: room.orderRollGroups,
+        orderRollCurrentGroup: room.orderRollCurrentGroup,
+        orderRollRerolling: room.orderRollRerolling
+      });
 
       broadcastToRoom(roomId, {
         type: "game_state",
@@ -225,8 +242,9 @@ server.on("connection", (socket) => {
       });
     }
 
-    //順番決定
+    // 順番決定
     if (data.type === "order_roll") {
+
       if (!socket.playerId) {
         return;
       }
@@ -236,16 +254,27 @@ server.on("connection", (socket) => {
       const roomId = playerRooms[playerId];
       const room = getRoom(roomId);
 
-
       if (!room) {
         return;
+      }
+
+      if (!room.gameStarting) {
+        return;
+      }
+
+      if (room.orderRollRerolling) {
+        if (!room.orderRollCurrentGroup.includes(playerId)) {
+          return;
+        }
       }
 
       if (room.orderRolls[playerId] !== undefined) {
         return;
       }
 
-      const dice = Math.floor(Math.random() * 6) + 1;
+      // サイコロを振る
+      const result = rollOrder(playerId);
+      const dice = result.value;
 
       room.orderRolls[playerId] = dice;
       room.orderRollResults[playerId] = dice;
@@ -257,6 +286,7 @@ server.on("connection", (socket) => {
         dice
       );
 
+      // サイコロ結果を全員に通知
       broadcastToRoom(roomId, {
         type: "order_roll_result",
         playerId: playerId,
@@ -264,187 +294,113 @@ server.on("connection", (socket) => {
         value: dice
       });
 
+      // 必要なプレイヤーが全員振ったか確認
+      const requiredPlayers =
+        room.orderRollRerolling
+          ? room.orderRollCurrentGroup
+          : room.players;
 
-      if (
-        Object.keys(room.orderRolls).length ===
-        (
-          room.orderRollRerolling
-            ? room.orderRollGroups.flat().length
-            : room.players.length
-        )
-      ) {
+      const allRolled =
+        requiredPlayers.every(
+          (id) => room.orderRolls[id] !== undefined
+        );
 
-        console.log("全員のサイコロが終了しました");
+      if (!allRolled) {
+        return;
+      }
 
-        const results = room.players.map((id) => {
-          return {
-            playerId: id,
-            value: room.orderRollResults[id]
-          };
-        });
+      console.log("全員のサイコロが終了しました");
 
-        const valueCount = {};
+      // 結果を作る
+      const results = room.players.map((id) => {
+        return {
+          playerId: id,
+          value: room.orderRollResults[id]
+        };
+      });
 
-        for (const result of results) {
-          valueCount[result.value] =
-            (valueCount[result.value] || 0) + 1;
-        }
+      // resolveOrderに判定してもらう
+      const orderResult = resolveOrder(
+        results,
+        room.orderRollRerolling
+          ? room.orderRollGroups
+          : null
+      );
 
-        if (!room.orderRollRerolling) {
-          const sortedResults = [...results].sort(
-            (a, b) => b.value - a.value
-          );
+      console.log(
+        "順番決定の判定結果:",
+        orderResult
+      );
 
-          const groups = [];
-          let currentGroup = [];
-          let currentValue = null;
+      if (!room.orderRollRerolling) {
+        room.orderRollGroups = orderResult.groups;
+      }
 
-          for (const result of sortedResults) {
-            if (currentValue !== result.value) {
-              if (currentGroup.length > 0) {
-                groups.push(currentGroup);
-              }
+      // 振り直しが必要
+      if (!orderResult.finished) {
 
-              currentGroup = [];
-              currentValue = result.value;
-            }
-
-            currentGroup.push(result.playerId);
-          }
-
-          if (currentGroup.length > 0) {
-            groups.push(currentGroup);
-          }
-
-          room.orderRollGroups = groups;
-        }
-
-
-        let duplicatePlayers = [];
-
-        if (!room.orderRollRerolling) {
-          duplicatePlayers = room.orderRollGroups
-            .filter((group) => group.length > 1)
-            .flat()
-            .map((playerId) => {
-              return {
-                playerId: playerId,
-                value: room.orderRolls[playerId]
-              };
-            });
-        }
-
-        if (room.orderRollRerolling) {
-          const group = room.orderRollCurrentGroup;
-
-          const groupValues = group.map(
-            (playerId) => room.orderRolls[playerId]
-          );
-
-          const valueCount = {};
-
-          for (const value of groupValues) {
-            valueCount[value] =
-              (valueCount[value] || 0) + 1;
-          }
-
-          const samePlayers = group.filter(
-            (playerId) =>
-              valueCount[room.orderRolls[playerId]] > 1
-          );
-
-          if (samePlayers.length > 0) {
-            duplicatePlayers = samePlayers.map((playerId) => {
-              return {
-                playerId: playerId,
-                value: room.orderRolls[playerId]
-              };
-            });
-          }
-        }
+        const duplicatePlayers =
+          orderResult.duplicatePlayers;
 
         console.log(
           "振り直し対象:",
-          duplicatePlayers.map((result) => result.playerId)
+          duplicatePlayers
         );
 
+        room.orderRollRerolling = true;
 
-        if (duplicatePlayers.length > 0) {
-          room.orderRollRerolling = true;
+        room.orderRollCurrentGroup = duplicatePlayers;
 
-          room.orderRollCurrentGroup = duplicatePlayers.map(
-            (result) => result.playerId
-          );
-
-          console.log("同じ目がありました");
-          console.log("再度サイコロを振るプレイヤー:", duplicatePlayers);
-
-          for (const result of duplicatePlayers) {
-            delete room.orderRolls[result.playerId];
-          }
-
-          broadcastToRoom(roomId, {
-            type: "order_roll_start",
-            playerIds: duplicatePlayers.map(
-              (result) => result.playerId
-            )
-          });
-
-          return;
+        // 振り直すプレイヤーの現在の出目を削除
+        for (const duplicatePlayerId of duplicatePlayers) {
+          delete room.orderRolls[duplicatePlayerId];
         }
 
-        if (room.orderRollRerolling && duplicatePlayers.length === 0) {
-          room.orderRollRerolling = false;
-          room.orderRollCurrentGroup = [];
-        }
-
-        // 最初に決まった順位グループを維持する
-        const groupedResults = [];
-
-        for (const group of room.orderRollGroups) {
-          const groupResults = group.map((playerId) => {
-            return {
-              playerId: playerId,
-              value: room.orderRollResults[playerId]
-            };
-          });
-
-          // 同じ順位グループの中だけ、振り直し結果で並べる
-          groupResults.sort((a, b) => b.value - a.value);
-
-          groupedResults.push(...groupResults);
-        }
-
-        console.log("順番決定結果:", groupedResults);
-
-        room.turnOrder = groupedResults.map(
-          (result) => result.playerId
-        );
-
-        room.orderRollRerolling = false;
-
-        room.currentTurn = room.turnOrder[0];
-
-        room.gameStarted = true;
-        room.gameStarting = false;
-
+        // 振り直し対象者に通知
         broadcastToRoom(roomId, {
-          type: "game_state",
-          state: createGameState(room)
+          type: "order_roll_start",
+          playerIds: duplicatePlayers
         });
 
-
-        broadcastToRoom(roomId, {
-          type: "order_decided",
-          turnOrder: room.turnOrder
-        });
-
-        broadcastToRoom(roomId, {
-          type: "turn_changed",
-          playerId: room.currentTurn,
-          playerName: getPlayer(room.currentTurn).name
-        });
+        return;
       }
+
+      // 振り直し不要 → 順番決定完了
+      room.turnOrder =
+        orderResult.turnOrder;
+
+      room.orderRollRerolling = false;
+      room.orderRollCurrentGroup = [];
+
+      room.currentTurn =
+        room.turnOrder[0];
+
+      room.gameStarted = true;
+      room.gameStarting = false;
+
+
+      console.log(
+        "順番決定結果:",
+        room.turnOrder
+      );
+
+      broadcastToRoom(roomId, {
+        type: "game_state",
+        state: createGameState(room)
+      });
+
+
+      broadcastToRoom(roomId, {
+        type: "order_decided",
+        turnOrder: room.turnOrder
+      });
+
+
+      broadcastToRoom(roomId, {
+        type: "turn_changed",
+        playerId: room.currentTurn,
+        playerName: getPlayer(room.currentTurn).name
+      });
     }
 
     //サイコロ
