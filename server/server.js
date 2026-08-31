@@ -40,6 +40,10 @@ const {
   handleStartGame
 } = require("./handlers/game-handler");
 
+const {
+  handleOrderRoll
+} = require("./handlers/order-handler");
+
 console.log("WebSocketサーバーを起動しました");
 
 // 指定したルームに接続している全プレイヤーへメッセージを送信
@@ -143,162 +147,10 @@ server.on("connection", (socket) => {
 
     // 順番決定
     if (data.type === "order_roll") {
-
-      if (!socket.playerId) {
-        return;
-      }
-
-      const playerId = socket.playerId;
-      const player = getPlayer(playerId);
-      const roomId = playerRooms[playerId];
-      const room = getRoom(roomId);
-
-      if (!room) {
-        return;
-      }
-
-      if (!room.gameStarting) {
-        return;
-      }
-
-      if (room.orderRollRerolling) {
-        if (!room.orderRollCurrentGroup.includes(playerId)) {
-          return;
-        }
-      }
-
-      if (room.orderRolls[playerId] !== undefined) {
-        return;
-      }
-
-      // ルーレットを回す
-      const result = rollOrder(playerId);
-      const dice = result.value;
-
-      room.orderRolls[playerId] = dice;
-      room.orderRollResults[playerId] = dice;
-
-      console.log(
-        "Player",
-        playerId,
-        "の順番決定ルーレット:",
-        dice
-      );
-
-      // ルーレット結果を全員に通知
-      broadcastToRoom(roomId, {
-        type: "order_roll_result",
-        playerId: playerId,
-        playerName: player.name,
-        value: dice
-      });
-
-      // 必要なプレイヤーが全員回したか確認
-      const requiredPlayers =
-        room.orderRollRerolling
-          ? room.orderRollCurrentGroup
-          : room.players;
-
-      const allRolled =
-        requiredPlayers.every(
-          (id) => room.orderRolls[id] !== undefined
-        );
-
-      if (!allRolled) {
-        return;
-      }
-
-      console.log("全員のルーレットが終了しました");
-
-      // 結果を作る
-      const results = room.players.map((id) => {
-        return {
-          playerId: id,
-          value: room.orderRollResults[id]
-        };
-      });
-
-      // resolveOrderに判定してもらう
-      const orderResult = resolveOrder(
-        results,
-        room.orderRollRerolling
-          ? room.orderRollGroups
-          : null
-      );
-
-      console.log(
-        "順番決定の判定結果:",
-        orderResult
-      );
-
-      if (!room.orderRollRerolling) {
-        room.orderRollGroups = orderResult.groups;
-      }
-
-      // 回し直しが必要
-      if (!orderResult.finished) {
-
-        const duplicatePlayers =
-          orderResult.duplicatePlayers;
-
-        console.log(
-          "回し直し対象:",
-          duplicatePlayers
-        );
-
-        room.orderRollRerolling = true;
-
-        room.orderRollCurrentGroup = duplicatePlayers;
-
-        // 回し直すプレイヤーの現在の結果を削除
-        for (const duplicatePlayerId of duplicatePlayers) {
-          delete room.orderRolls[duplicatePlayerId];
-        }
-
-        // 回し直し対象者に通知
-        broadcastToRoom(roomId, {
-          type: "order_roll_start",
-          playerIds: duplicatePlayers
-        });
-
-        return;
-      }
-
-      // 回し直し不要 → 順番決定完了
-      room.turnOrder =
-        orderResult.turnOrder;
-
-      room.orderRollRerolling = false;
-      room.orderRollCurrentGroup = [];
-
-      room.currentTurn =
-        room.turnOrder[0];
-
-      room.gameStarted = true;
-      room.gameStarting = false;
-
-
-      console.log(
-        "順番決定結果:",
-        room.turnOrder
-      );
-
-      broadcastToRoom(roomId, {
-        type: "game_state",
-        state: createGameState(room)
-      });
-
-
-      broadcastToRoom(roomId, {
-        type: "order_decided",
-        turnOrder: room.turnOrder
-      });
-
-
-      broadcastToRoom(roomId, {
-        type: "turn_changed",
-        playerId: room.currentTurn,
-        playerName: getPlayer(room.currentTurn).name
+      handleOrderRoll({
+        socket,
+        playerRooms,
+        broadcastToRoom
       });
     }
 
