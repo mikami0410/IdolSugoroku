@@ -1,7 +1,8 @@
 const {
   board,
   getRandomEventByType,
-  applyEvent
+  applyEvent,
+  createRanking
 } = require("../game-system");
 
 const {
@@ -21,29 +22,6 @@ function getBoardCell(position) {
   return board.find(
     (cell) => cell.number === position
   );
-}
-
-// ルーム内のプレイヤーをファン数の多い順に並べてランキングを作成
-function createRanking(room) {
-  const ranking = room.players.map((playerId) => {
-    const player = getPlayer(playerId);
-
-    return {
-      playerId: player.id,
-      playerName: player.name,
-      fans: player.fans
-    };
-  });
-
-  ranking.sort(
-    (a, b) => b.fans - a.fans
-  );
-
-  ranking.forEach((player, index) => {
-    player.rank = index + 1;
-  });
-
-  return ranking;
 }
 
 // ゲームルーレット処理

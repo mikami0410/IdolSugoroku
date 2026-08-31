@@ -10,6 +10,10 @@
 //     GOAL = 9
 // }
 
+const {
+    getPlayer
+} = require("./player");
+
 const board = [
     { number: 1, type: 8 }, // start
 
@@ -134,7 +138,7 @@ function applyEvent(player, event) {
         case "visual_lesson":
             changeSkillLevel(player, "visual", 20);
             break;
-        
+
         // ファン獲得系
         case "singing_video":
             changeFans(player, 20);
@@ -163,7 +167,7 @@ function applyEvent(player, event) {
         case "live_stream":
             changeFans(player, 25);
             break;
-        
+
         // トラブル系
         case "leg_injury":
             changeSkillLevel(player, "dance", -10);
@@ -189,12 +193,12 @@ function applyEvent(player, event) {
     }
 }
 
-function changeSkillLevel(player, skill, amount){
+function changeSkillLevel(player, skill, amount) {
     player.skills[skill] += amount;
 
-    if(player.skills[skill] > 100) {
+    if (player.skills[skill] > 100) {
         player.skills[skill] = 100;
-    } else if(player.skills[skill] < 0) {
+    } else if (player.skills[skill] < 0) {
         player.skills[skill] = 0;
     }
 }
@@ -202,7 +206,7 @@ function changeSkillLevel(player, skill, amount){
 function changeFans(player, amount) {
     player.fans += amount;
 
-    if(player.fans < 0) {
+    if (player.fans < 0) {
         player.fans = 0;
     }
 }
@@ -220,8 +224,32 @@ function getSkillRank(value) {
     }
 }
 
+// ルーム内のプレイヤーをファン数の多い順に並べてランキングを作成
+function createRanking(room) {
+    const ranking = room.players.map((playerId) => {
+        const player = getPlayer(playerId);
+
+        return {
+            playerId: player.id,
+            playerName: player.name,
+            fans: player.fans
+        };
+    });
+
+    ranking.sort(
+        (a, b) => b.fans - a.fans
+    );
+
+    ranking.forEach((player, index) => {
+        player.rank = index + 1;
+    });
+
+    return ranking;
+}
+
 module.exports = {
     board,
     getRandomEventByType,
-    applyEvent
+    applyEvent,
+    createRanking
 };

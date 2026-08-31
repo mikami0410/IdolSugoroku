@@ -49,12 +49,12 @@ server.on("connection", (socket) => {
     });
   });
 
-socket.on("close", () => {
-  handleDisconnect({
-    socket,
-    sockets,
-    playerRooms,
-    broadcastToRoom
+  socket.on("close", () => {
+    handleDisconnect({
+      socket,
+      sockets,
+      playerRooms,
+      broadcastToRoom
+    });
   });
-});
 });
