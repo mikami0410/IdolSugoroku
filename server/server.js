@@ -36,6 +36,10 @@ const {
   handleJoin
 } = require("./handlers/join-handler");
 
+const {
+  handleStartGame
+} = require("./handlers/game-handler");
+
 console.log("WebSocketサーバーを起動しました");
 
 // 指定したルームに接続している全プレイヤーへメッセージを送信
@@ -130,59 +134,10 @@ server.on("connection", (socket) => {
 
     //ゲーム開始
     if (data.type === "start_game") {
-      if (!socket.playerId) {
-        return;
-      }
-
-      const playerId = socket.playerId;
-      const roomId = playerRooms[playerId];
-      const room = getRoom(roomId);
-
-      if (!room) {
-        return;
-      }
-
-      if (room.players.length < 2) {
-        socket.send(JSON.stringify({
-          type: "error",
-          message: "ゲームを開始するには2人以上必要です"
-        }));
-
-        return;
-      }
-
-      if (room.gameStarted || room.gameStarting) {
-        return;
-      }
-
-      room.gameStarting = true;
-
-      console.log(
-        "ゲーム開始:",
-        roomId
-      );
-
-      room.orderRolls = {};
-      room.orderRollResults = {};
-      room.orderRollGroups = [];
-      room.orderRollCurrentGroup = [];
-      room.orderRollRerolling = false;
-
-      console.log("順番決定データを初期化しました:", {
-        orderRolls: room.orderRolls,
-        orderRollResults: room.orderRollResults,
-        orderRollGroups: room.orderRollGroups,
-        orderRollCurrentGroup: room.orderRollCurrentGroup,
-        orderRollRerolling: room.orderRollRerolling
-      });
-
-      broadcastToRoom(roomId, {
-        type: "game_state",
-        state: createGameState(room)
-      });
-
-      broadcastToRoom(roomId, {
-        type: "order_roll_start"
+      handleStartGame({
+        socket,
+        playerRooms,
+        broadcastToRoom
       });
     }
 
