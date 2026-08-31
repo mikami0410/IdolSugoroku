@@ -2,7 +2,8 @@ const {
   getRandomEventByType,
   applyEvent,
   createRanking,
-  getBoardCell
+  getBoardCell,
+  getNextTurnPlayer
 } = require("../game-system");
 
 const {
@@ -188,28 +189,9 @@ function handleSpinRoulette({
     position: player.position
   });
 
-  // 現在のプレイヤーのターン位置を取得
-  const currentIndex =
-    room.turnOrder.indexOf(playerId);
-
-  let nextIndex =
-    (currentIndex + 1) %
-    room.turnOrder.length;
-
-  // ゴールしているプレイヤーを飛ばす
-  while (
-    getPlayer(
-      room.turnOrder[nextIndex]
-    ).finished
-  ) {
-    nextIndex =
-      (nextIndex + 1) %
-      room.turnOrder.length;
-  }
-
-  // 次のターンを設定
-  room.currentTurn =
-    room.turnOrder[nextIndex];
+// 次のターンを設定
+room.currentTurn =
+  getNextTurnPlayer(room, playerId);
 
   console.log(
     "次のターン:",

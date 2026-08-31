@@ -254,10 +254,33 @@ function createRanking(room) {
     return ranking;
 }
 
+// 次のターンのプレイヤーを取得
+function getNextTurnPlayer(room, playerId) {
+    const currentIndex =
+        room.turnOrder.indexOf(playerId);
+
+    let nextIndex =
+        (currentIndex + 1) %
+        room.turnOrder.length;
+
+    while (
+        getPlayer(
+            room.turnOrder[nextIndex]
+        ).finished
+    ) {
+        nextIndex =
+            (nextIndex + 1) %
+            room.turnOrder.length;
+    }
+
+    return room.turnOrder[nextIndex];
+}
+
 module.exports = {
     board,
     getRandomEventByType,
     applyEvent,
     createRanking,
-    getBoardCell
+    getBoardCell,
+    getNextTurnPlayer
 };
