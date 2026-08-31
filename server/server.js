@@ -6,15 +6,7 @@ const sockets = {};
 const playerRooms = {};
 
 const {
-  getPlayer,
-  removePlayer
-} = require("./player");
-
-const {
-  getRoom,
-  removeRoom,
-  removePlayerFromRoom,
-  getRooms
+  getRoom
 } = require("./room");
 
 const {
@@ -33,6 +25,10 @@ const {
   handleSpinRoulette
 } = require("./handlers/roulette-handler");
 
+const {
+  handleDisconnect
+} = require("./handlers/disconnect-handler");
+
 console.log("WebSocketサーバーを起動しました");
 
 // 指定したルームに接続している全プレイヤーへメッセージを送信
@@ -50,16 +46,6 @@ function broadcastToRoom(roomId, message) {
       socket.send(JSON.stringify(message));
     }
   }
-}
-
-// 現在のゲーム状態を取得
-function createGameState(room) {
-  return {
-    gameStarted: room.gameStarted,
-    currentTurn: room.currentTurn,
-    turnOrder: room.turnOrder,
-    players: room.players.map((playerId) => getPlayer(playerId))
-  };
 }
 
 server.on("connection", (socket) => {
@@ -128,73 +114,11 @@ server.on("connection", (socket) => {
   });
 
   socket.on("close", () => {
-    const playerId = socket.playerId;
-
-    if (!playerId) {
-      return;
-    }
-
-    const roomId = playerRooms[playerId];
-    const room = getRoom(roomId);
-
-    console.log("プレイヤーが切断しました:", playerId);
-
-    delete sockets[playerId];
-    removePlayer(playerId);
-    delete playerRooms[playerId];
-
-    if (!room) {
-      return;
-    }
-
-    //プレイヤーをルームから削除
-    removePlayerFromRoom(roomId, playerId);
-
-    if (room.gameStarted && room.players.length === 1) {
-      room.gameStarted = false;
-      room.currentTurn = null;
-      room.turnOrder = [];
-
-      broadcastToRoom(roomId, {
-        type: "game_finished",
-        reason: "player_left"
-      });
-    }
-
-    if (room.players.length === 0) {
-      removeRoom(roomId);
-    }
-
-    if (room.currentTurn === playerId) {
-      const currentIndex = room.turnOrder.indexOf(playerId);
-
-      let nextPlayerId = null;
-
-      if (currentIndex !== -1 && room.turnOrder.length > 1) {
-        nextPlayerId =
-          room.turnOrder[(currentIndex + 1) % room.turnOrder.length];
-      }
-
-      room.currentTurn = nextPlayerId;
-
-      if (nextPlayerId) {
-        broadcastToRoom(roomId, {
-          type: "turn_changed",
-          playerId: nextPlayerId,
-          playerName: getPlayer(nextPlayerId).name
-        });
-      }
-    }
-
-    room.turnOrder = room.turnOrder.filter(
-      (id) => id !== playerId
-    );
-
-    broadcastToRoom(roomId, {
-      type: "player_left",
-      playerId: playerId
+    handleDisconnect({
+      socket,
+      sockets,
+      playerRooms,
+      broadcastToRoom
     });
-
-    console.log("現在のルーム:", getRooms());
   });
 });
