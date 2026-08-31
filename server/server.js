@@ -10,24 +10,12 @@ const {
 } = require("./room");
 
 const {
-  handleJoin
-} = require("./handlers/join-handler");
-
-const {
-  handleStartGame
-} = require("./handlers/game-handler");
-
-const {
-  handleOrderRoll
-} = require("./handlers/order-handler");
-
-const {
-  handleSpinRoulette
-} = require("./handlers/roulette-handler");
-
-const {
   handleDisconnect
 } = require("./handlers/disconnect-handler");
+
+const {
+  handleMessage
+} = require("./handlers/message-handler");
 
 console.log("WebSocketサーバーを起動しました");
 
@@ -52,73 +40,21 @@ server.on("connection", (socket) => {
   console.log("クライアントが接続しました");
 
   socket.on("message", (message) => {
-    let data;
-
-    try {
-      data = JSON.parse(message.toString());
-    } catch (error) {
-      socket.send(JSON.stringify({
-        type: "error",
-        message: "不正なデータです"
-      }));
-
-      return;
-    }
-
-    console.log("受信したデータ:", data);
-
-    if (typeof data.type !== "string") {
-      socket.send(JSON.stringify({
-        type: "error",
-        message: "メッセージのtypeが指定されていません"
-      }));
-
-      return;
-    }
-
-    //ルーム参加
-    if (data.type === "join") {
-      handleJoin(socket, data, {
-        sockets,
-        playerRooms,
-        broadcastToRoom
-      });
-    }
-
-    //ゲーム開始
-    if (data.type === "start_game") {
-      handleStartGame({
-        socket,
-        playerRooms,
-        broadcastToRoom
-      });
-    }
-
-    // 順番決定
-    if (data.type === "order_roll") {
-      handleOrderRoll({
-        socket,
-        playerRooms,
-        broadcastToRoom
-      });
-    }
-
-    //ルーレット
-    if (data.type === "spin_roulette") {
-      handleSpinRoulette({
-        socket,
-        playerRooms,
-        broadcastToRoom
-      });
-    }
-  });
-
-  socket.on("close", () => {
-    handleDisconnect({
+    handleMessage({
       socket,
+      message,
       sockets,
       playerRooms,
       broadcastToRoom
     });
   });
+
+socket.on("close", () => {
+  handleDisconnect({
+    socket,
+    sockets,
+    playerRooms,
+    broadcastToRoom
+  });
+});
 });
