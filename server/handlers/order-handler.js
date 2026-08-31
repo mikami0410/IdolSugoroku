@@ -11,6 +11,10 @@ const {
   resolveOrder
 } = require("../order-system");
 
+const {
+  createGameState
+} = require("../game-state");
+
 // 順番決定ルーレット処理
 function handleOrderRoll({
   socket,
@@ -175,14 +179,7 @@ function handleOrderRoll({
   // ゲーム状態を全プレイヤーに通知
   broadcastToRoom(roomId, {
     type: "game_state",
-    state: {
-      gameStarted: room.gameStarted,
-      currentTurn: room.currentTurn,
-      turnOrder: room.turnOrder,
-      players: room.players.map(
-        (playerId) => getPlayer(playerId)
-      )
-    }
+    state: createGameState(room)
   });
 
   // 順番決定結果を全プレイヤーに通知

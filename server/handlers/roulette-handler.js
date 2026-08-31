@@ -12,6 +12,10 @@ const {
   getRoom
 } = require("../room");
 
+const {
+  createGameState
+} = require("../game-state");
+
 // プレイヤーの現在位置に対応するマスの情報を取得
 function getBoardCell(position) {
   return board.find(
@@ -254,15 +258,7 @@ function handleSpinRoulette({
   // 最新のゲーム状態を通知
   broadcastToRoom(roomId, {
     type: "game_state",
-    state: {
-      gameStarted: room.gameStarted,
-      currentTurn: room.currentTurn,
-      turnOrder: room.turnOrder,
-      players: room.players.map(
-        (playerId) =>
-          getPlayer(playerId)
-      )
-    }
+    state: createGameState(room)
   });
 }
 

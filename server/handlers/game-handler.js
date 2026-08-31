@@ -1,10 +1,10 @@
 const {
-  getPlayer
-} = require("../player");
-
-const {
   getRoom
 } = require("../room");
+
+const {
+  createGameState
+} = require("../game-state");
 
 // ゲーム開始処理
 function handleStartGame({
@@ -59,14 +59,7 @@ function handleStartGame({
   // 現在のゲーム状態を全プレイヤーに通知
   broadcastToRoom(roomId, {
     type: "game_state",
-    state: {
-      gameStarted: room.gameStarted,
-      currentTurn: room.currentTurn,
-      turnOrder: room.turnOrder,
-      players: room.players.map(
-        (playerId) => getPlayer(playerId)
-      )
-    }
+    state: createGameState(room)
   });
 
   // 順番決定ルーレットの開始を全プレイヤーに通知
