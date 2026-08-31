@@ -1,8 +1,8 @@
 const {
-  board,
   getRandomEventByType,
   applyEvent,
-  createRanking
+  createRanking,
+  getBoardCell
 } = require("../game-system");
 
 const {
@@ -16,13 +16,6 @@ const {
 const {
   createGameState
 } = require("../game-state");
-
-// プレイヤーの現在位置に対応するマスの情報を取得
-function getBoardCell(position) {
-  return board.find(
-    (cell) => cell.number === position
-  );
-}
 
 // ゲームルーレット処理
 function handleSpinRoulette({

@@ -224,6 +224,13 @@ function getSkillRank(value) {
     }
 }
 
+// 現在位置に対応するマスの情報を取得
+function getBoardCell(position) {
+    return board.find(
+        (cell) => cell.number === position
+    );
+}
+
 // ルーム内のプレイヤーをファン数の多い順に並べてランキングを作成
 function createRanking(room) {
     const ranking = room.players.map((playerId) => {
@@ -251,5 +258,6 @@ module.exports = {
     board,
     getRandomEventByType,
     applyEvent,
-    createRanking
+    createRanking,
+    getBoardCell
 };
