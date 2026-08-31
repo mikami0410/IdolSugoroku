@@ -6,31 +6,16 @@ const sockets = {};
 const playerRooms = {};
 
 const {
-  board,
-  getRandomEventByType,
-  applyEvent
-} = require("./game-system");
-
-const {
-  createPlayer,
   getPlayer,
-  removePlayer,
-  getPlayers
+  removePlayer
 } = require("./player");
 
 const {
-  createRoom,
   getRoom,
   removeRoom,
-  addPlayerToRoom,
   removePlayerFromRoom,
   getRooms
 } = require("./room");
-
-const {
-  rollOrder,
-  resolveOrder
-} = require("./order-system");
 
 const {
   handleJoin
@@ -43,6 +28,10 @@ const {
 const {
   handleOrderRoll
 } = require("./handlers/order-handler");
+
+const {
+  handleSpinRoulette
+} = require("./handlers/roulette-handler");
 
 console.log("WebSocketサーバーを起動しました");
 
@@ -71,32 +60,6 @@ function createGameState(room) {
     turnOrder: room.turnOrder,
     players: room.players.map((playerId) => getPlayer(playerId))
   };
-}
-
-// プレイヤーの現在位置に対応するマスの情報を取得
-function getBoardCell(position) {
-  return board.find((cell) => cell.number === position);
-}
-
-// ルーム内のプレイヤーをファン数の多い順に並べてランキングを作成
-function createRanking(room) {
-  const ranking = room.players.map((playerId) => {
-    const player = getPlayer(playerId);
-
-    return {
-      playerId: player.id,
-      playerName: player.name,
-      fans: player.fans
-    };
-  });
-
-  ranking.sort((a, b) => b.fans - a.fans);
-
-  ranking.forEach((player, index) => {
-    player.rank = index + 1;
-  });
-
-  return ranking;
 }
 
 server.on("connection", (socket) => {
@@ -156,169 +119,11 @@ server.on("connection", (socket) => {
 
     //ルーレット
     if (data.type === "spin_roulette") {
-
-      if (!socket.playerId) {
-        return;
-      }
-
-      const playerId = socket.playerId;
-      const player = getPlayer(playerId);
-
-      const roomId = playerRooms[playerId];
-      const room = getRoom(roomId);
-
-      if (!room) {
-        return;
-      }
-
-      if (player.finished) {
-        socket.send(JSON.stringify({
-          type: "error",
-          message: "すでにゴールしています"
-        }));
-
-        return;
-      }
-
-
-      if (room.currentTurn !== playerId) {
-
-        socket.send(JSON.stringify({
-          type: "error",
-          message: "あなたのターンではありません"
-        }));
-
-        return;
-      }
-
-      const dice = Math.floor(Math.random() * 6) + 1;
-
-      player.position += dice;
-
-      if (player.position >= 30) {
-        player.position = 30;
-        player.finished = true;
-      }
-
-      const allFinished = room.players.every(
-        (id) => getPlayer(id).finished
-      );
-
-      if (allFinished) {
-        const ranking = createRanking(room);
-
-        broadcastToRoom(roomId, {
-          type: "game_finished",
-          ranking: ranking
-        });
-
-        return;
-      }
-
-      const cell = getBoardCell(player.position);
-
-      if (!cell) {
-        console.log("マスが見つかりません:", player.position);
-
-        socket.send(JSON.stringify({
-          type: "error",
-          message: "移動先のマスが見つかりません"
-        }));
-
-        return;
-      }
-
-      let event = null;
-
-      if (cell.type >= 1 && cell.type <= 7) {
-        event = getRandomEventByType(cell.type);
-
-        console.log("イベント前:", player);
-
-        if (event) {
-          applyEvent(player, event);
-        }
-      }
-
-      console.log("イベント:", event);
-      console.log("イベント後:", player);
-
-
-      console.log(
-        "止まったマス:",
-        cell
-      );
-
-      broadcastToRoom(roomId, {
-        type: "cell_event",
-        playerId: playerId,
-        playerName: player.name,
-        cell: cell,
-        event: event
+      handleSpinRoulette({
+        socket,
+        playerRooms,
+        broadcastToRoom
       });
-
-      console.log(
-        "プレイヤー",
-        playerId,
-        "のルーレットの結果:",
-        dice
-      );
-
-      console.log(
-        "プレイヤー",
-        playerId,
-        "の現在位置:",
-        player.position
-      );
-
-      broadcastToRoom(roomId, {
-        type: "roulette_result",
-        playerId: playerId,
-        playerName: player.name,
-        value: dice
-      });
-
-
-      broadcastToRoom(roomId, {
-        type: "player_moved",
-        playerId: playerId,
-        playerName: player.name,
-        position: player.position
-      });
-
-
-      const currentIndex =
-        room.turnOrder.indexOf(playerId);
-
-      let nextIndex =
-        (currentIndex + 1) % room.turnOrder.length;
-
-      while (
-        getPlayer(room.turnOrder[nextIndex]).finished
-      ) {
-        nextIndex =
-          (nextIndex + 1) % room.turnOrder.length;
-      }
-
-      room.currentTurn =
-        room.turnOrder[nextIndex];
-
-      console.log(
-        "次のターン:",
-        room.currentTurn
-      );
-
-      broadcastToRoom(roomId, {
-        type: "turn_changed",
-        playerId: room.currentTurn,
-        playerName: getPlayer(room.currentTurn).name
-      });
-
-      broadcastToRoom(roomId, {
-        type: "game_state",
-        state: createGameState(room)
-      });
-
     }
   });
 
