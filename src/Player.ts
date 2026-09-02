@@ -4,6 +4,7 @@ export class Player{
     private vocal: number;
     private dance: number;
     private visual: number;
+    private masuNumber: number;
 
     constructor(name: string){
         this.name = name;
@@ -11,6 +12,7 @@ export class Player{
         this.vocal = 0;
         this.dance = 0;
         this.visual = 0;
+        this.masuNumber = 0;
     }
 
     public getName(): string{
@@ -47,5 +49,13 @@ export class Player{
 
     public setVisual(newVisual: number): void{
         this.visual = newVisual;
+    }
+
+    public getMasuNumber(): number{
+        return this.masuNumber;
+    }
+
+    public setMasuNumber(masuNum: number): void{
+        this.masuNumber = masuNum;
     }
 }

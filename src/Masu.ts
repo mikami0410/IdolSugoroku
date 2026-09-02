@@ -2,17 +2,17 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
 export enum EventType {
-    VOCAL_LESSON = 1,
-    DANCE_LESSON = 2,
-    VISUAL_LESSON = 3,
-    SELECT_LESSON = 4,
-    VOCAL_FAN = 5,
-    DANCE_FAN = 6,
-    VISUAL_FAN = 7,
-    TROUBLE = 8,
-    ORDITION = 9,
-    START = 10,
-    GOAL = 11
+    VOCAL_LESSON,
+    DANCE_LESSON,
+    VISUAL_LESSON,
+    SELECT_LESSON,
+    VOCAL_FAN,
+    DANCE_FAN,
+    VISUAL_FAN,
+    TROUBLE,
+    ORDITION,
+    START,
+    GOAL
 }
 
 export class Masu {
@@ -24,12 +24,13 @@ export class Masu {
 
     private masu!: THREE.Object3D;
 
-    constructor(eventType: EventType, eventTitle: string, discription: string, positionX: number, positionZ: number) {
+    constructor(eventType: EventType, eventTitle: string, discription: string, positionX: number, positionZ: number, scene: THREE.Scene) {
         this.eventType = eventType;
         this.eventTitle = eventTitle;
         this.description = discription;
         this.positionX = positionX;
         this.positionZ = positionZ;
+        this.createMasu(scene);
     }
 
     public createMasu(scene: THREE.Scene): void {

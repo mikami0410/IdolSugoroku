@@ -25,7 +25,7 @@ export class Roulette {
                 }
                 child.material = new THREE.MeshBasicMaterial({map: texture});
             });
-            this.huti.position.set(0, 1, 0);
+            this.huti.position.set(0, 5, 0);
             this.huti.scale.set(5, 5, 5);
             scene.add(this.huti);
         });
@@ -44,7 +44,7 @@ export class Roulette {
                 }
                 child.material = new THREE.MeshBasicMaterial({map: texture});
             });
-            this.men.position.set(0, 1, 0);
+            this.men.position.set(0, 5, 0);
             this.men.scale.set(5, 5, 5);
             scene.add(this.men);
             this.hide();
@@ -74,11 +74,14 @@ export class Roulette {
             if (progress < 1) {
                 requestAnimationFrame(animate);
             } else {
-                this.isRollong = false;
                 console.log(this.deme);
                 if(this.rollingEnd){
                     this.rollingEnd(this.deme);
                 }
+
+                setTimeout(()=>{
+                    this.hide();
+                }, 2000);
             }
         };
         requestAnimationFrame(animate);
@@ -102,6 +105,7 @@ export class Roulette {
     public hide(): void{
         this.huti.visible = false;
         this.men.visible = false;
+        this.isRollong = false;
     }
 
     public getDeme(): number{
@@ -110,5 +114,9 @@ export class Roulette {
 
     public setRollingEnd(callback: (deme: number)=>void): void{
         this.rollingEnd = callback;
+    }
+
+    public getIsRolling(): boolean{
+        return this.isRollong;
     }
 }

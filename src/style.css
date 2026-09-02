@@ -97,7 +97,7 @@ canvas {
 }
 
 .masu-description{
-    font-size: 20px;
+    font-size: 25px;
 }
 
 /* ルーレットボタン */
@@ -137,4 +137,13 @@ canvas {
 
 .roulette-description{
     font-size: 25px;
+}
+
+/* 背景隠す用 */
+#roulette-overlay {
+    position: absolute;
+    inset: 0;
+    background: #555;
+    display: none;
+    z-index: 10;
 }

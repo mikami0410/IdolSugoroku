@@ -12,6 +12,9 @@ export class RouletteButton{
         }
         gameContainer.appendChild(this.element);
         this.element.addEventListener("click", ()=>{
+            if(roulette.getIsRolling()){
+                return;
+            }
             roulette.roll()
         });
     }
