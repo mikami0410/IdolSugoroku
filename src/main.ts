@@ -1,13 +1,14 @@
 import * as THREE from "three";
 import {Masu, EventType} from "./Masu";
-import { masuPosition } from "./Positions";
+import { masuPosition, eventTypes } from "./Positions";
 import { Road } from "./Road";
 import { roadDirection } from "./Positions";
 import { Player } from "./Player";
 import { StatusDisplay } from "./StatusDisplay";
 import { DescriptionDisplay } from "./DescriptionDisplay";
-import { Dice } from "./Dice";
-import { DiceButton } from "./DiceButton";
+import { Roulette } from "./Roulette";
+import { RouletteButton } from "./RouletteButton";
+import { RouletteDisplay } from "./RouletteDisplay";
 import "./style.css";
 
 // プレイヤー
@@ -79,9 +80,9 @@ const masus: Masu[] = []
 for(let i = 0; i < masuPosition.length; i++){
     const [x, z] = masuPosition[i];
     masus[i] = new Masu(
-        EventType.VOCAL_LESSON,
+        eventTypes[i],
         "イベントのタイトル",
-        `マス${i+1}`,
+        `イベントの内容`,
         x,
         z
     )
@@ -112,9 +113,19 @@ renderer.domElement.addEventListener("click", () => {
     a++;
 });
 
-// さいころ
-const dice = new Dice(scene);
-const diceButton = new DiceButton(dice);
+// ルーレット
+const roulette = new Roulette(scene);
+const rouletteButton = new RouletteButton(roulette);
+
+const rouletteDisplay: RouletteDisplay = new RouletteDisplay();
+rouletteDisplay.hide();
+roulette.setRollingEnd(deme=>{
+    rouletteDisplay.show(roulette, `${deme}マス進む`);
+    setTimeout(() =>{
+        roulette.hide();
+    }, 1000);
+});
+
 
 // 描画
 

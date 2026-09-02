@@ -50,7 +50,7 @@ export class Masu {
                 }
                 child.material = new THREE.MeshBasicMaterial({
                     map: texture
-                })
+                });
             });
             this.masu.position.set(this.positionX, 0, this.positionZ);
             this.masu.scale.set(10, 10, 10);
@@ -65,6 +65,24 @@ export class Masu {
                 return "/models/vocal_lesson.glb";
             case EventType.DANCE_LESSON:
                 return "/models/dance_lesson.glb";
+            case EventType.VISUAL_LESSON:
+                return "models/visual_lesson.glb";
+            case EventType.VOCAL_FAN:
+                return "models/vocal_fan.glb";
+            case EventType.DANCE_FAN:
+                return "models/dance_fan.glb";
+            case EventType.VISUAL_FAN:
+                return "models/visual_fan.glb";
+            case EventType.START:
+                return "models/start.glb";
+            case EventType.GOAL:
+                return "models/goal.glb";
+            case EventType.ORDITION:
+                return "models/start.glb";
+            case EventType.TROUBLE:
+                return "models/trouble.glb";
+            case EventType.SELECT_LESSON:
+                return "models/vocal_lesson.glb";
             default:
                 throw new Error("存在しないEventType : " + this.eventType);
         }
@@ -85,4 +103,14 @@ export class Masu {
     public getDiscription(): string {
         return this.description;
     }
+
+    public getPositionX(): number{
+        return this.positionX;
+    }
+
+    public getPositionZ(): number{
+        return this.positionZ;
+    }
 }
+
+// 20がオーディション

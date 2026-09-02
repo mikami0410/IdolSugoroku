@@ -1,3 +1,5 @@
+import { EventType } from "./Masu";
+
 // マス
 export const masuPosition: [number, number][] =[
     [-22, -13],
@@ -18,6 +20,44 @@ export const masuPosition: [number, number][] =[
     [1, 4],
     [-4, 4.5]
 ];
+
+// マスの内容
+export const eventTypes: EventType[] = [
+    EventType.START,
+
+    EventType.VOCAL_LESSON,
+    EventType.DANCE_LESSON,
+    EventType.VOCAL_FAN,
+    EventType.VISUAL_LESSON,
+    EventType.DANCE_FAN,
+    EventType.TROUBLE,
+    EventType.SELECT_LESSON,
+    EventType.VISUAL_FAN,
+    EventType.TROUBLE,
+
+    EventType.VOCAL_LESSON,
+    EventType.VOCAL_FAN,
+    EventType.TROUBLE,
+    EventType.DANCE_LESSON,
+    EventType.DANCE_FAN,
+    EventType.VISUAL_LESSON,
+    EventType.SELECT_LESSON,
+    EventType.VISUAL_FAN,
+    EventType.TROUBLE,
+    EventType.ORDITION,
+
+    EventType.VOCAL_FAN,
+    EventType.TROUBLE,
+    EventType.VOCAL_LESSON,
+    EventType.TROUBLE,
+    EventType.DANCE_FAN,
+    EventType.TROUBLE,
+    EventType.VISUAL_FAN,
+    EventType.TROUBLE,
+    EventType.VOCAL_FAN,
+
+    EventType.GOAL
+]
 
 // 道の方向
 export const roadDirection: [number, number][] = [

@@ -12,10 +12,8 @@ body {
     position: absolute;
     width: 1280px;
     height: 720px;
-
     left: 50%;
     top: 50%;
-
     transform-origin: center center;
     transform: translate(-50%, -50%) scale(var(--game-scale));
     overflow: hidden;
@@ -31,22 +29,15 @@ canvas {
 /* ステータス */
 #status {
     position: absolute;
-
     left: 30px;
     bottom: 30px;
-
     width: 900px;
     height: 150px;
-
     padding: 20px 30px;
-
     background-color: white;
-
     border: 2px solid black;
     border-radius: 10px;
-
     font-family: sans-serif;
-
     z-index: 100;
 }
 
@@ -87,22 +78,15 @@ canvas {
 /* マスの内容 */
 #masu{
     position: absolute;
-
     left: 30px;
     bottom: 30px;
-
     width: 900px;
     height: 150px;
-
     padding: 20px 30px;
-
     background-color: white;
-
     border: 2px solid black;
     border-radius: 10px;
-
     font-family: sans-serif;
-
     z-index: 100;
 }
 
@@ -116,24 +100,41 @@ canvas {
     font-size: 20px;
 }
 
-/* さいころ */
-#dice-button {
-
+/* ルーレットボタン */
+#roulette-button {
     position: absolute;
-
     left: 1000px;
     bottom: 145px;
-
     width: 250px;
     height: 80px;
-
     font-size: 28px;
-
     background-color: white;
-
     border: 2px solid black;
     border-radius: 10px;
-
     cursor: pointer;
+}
 
+/* ルーレット内容表示 */
+#roulette-display{
+    position: absolute;
+    left: 30px;
+    bottom: 30px;
+    width: 900px;
+    height: 150px;
+    padding: 20px 30px;
+    background-color: white;
+    border: 2px solid black;
+    border-radius: 10px;
+    font-family: sans-serif;
+    z-index: 100;
+}
+
+.roulette-deme{
+    font-size: 30px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.roulette-description{
+    font-size: 25px;
 }
