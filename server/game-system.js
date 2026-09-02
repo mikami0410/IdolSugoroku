@@ -108,49 +108,49 @@ const eventDetails = {
     // レッスン系
     vocal_lesson: {
         title: "ボーカルレッスン",
-        description: "歌のレッスンを受けて、ボーカルスキルが上がった！"
+        description: "歌のレッスンを受けたよ！ボーカルスキル +20"
     },
     dance_lesson: {
         title: "ダンスレッスン",
-        description: "ダンスのレッスンを受けて、ダンススキルが上がった！"
+        description: "ダンスのレッスンを受けたよ！ダンススキル +20"
     },
     visual_lesson: {
         title: "ビジュアルレッスン",
-        description: "メイクや表情の練習をして、ビジュアルスキルが上がった！"
+        description: "メイクや表情の練習をしたよ！ビジュアルスキル +20"
     },
 
     // ボーカルファン
     singing_video: {
         title: "歌ってみた動画の投稿",
-        description: "歌ってみた動画を投稿したら、たくさんの人に見てもらえた！"
+        description: "歌ってみた動画を投稿したよ！ファンが増える"
     },
     street_live: {
         title: "路上ライブ",
-        description: "路上ライブを行い、新しいファンを獲得した！"
+        description: "路上ライブを行ったよ！ファンが増える"
     },
     local_event: {
         title: "地元のイベントに出演",
-        description: "地元のイベントに出演して、地域の人たちに知ってもらえた！"
+        description: "地元のイベントに出演したよ！ファンが増える"
     },
 
     // ダンスファン
     dance_video: {
         title: "ダンス動画の投稿",
-        description: "ダンス動画をSNSに投稿したら、動画が話題になった！"
+        description: "ダンス動画をSNSに投稿したよ！ファンが増える"
     },
     dance_competition: {
         title: "ダンス大会に出場",
-        description: "ダンス大会に出場して、観客から注目を集めた！"
+        description: "ダンス大会に出場したよ！ファンが増える"
     },
     back_dancer: {
         title: "有名アーティストのバックダンサー",
-        description: "有名アーティストのバックダンサーを務め、多くの人に知ってもらえた！"
+        description: "有名アーティストのバックダンサーを務めたよ！ファンが増える"
     },
 
     // ビジュアルファン
     daily_photo: {
         title: "日常写真の投稿",
-        description: "日常の写真をSNSに投稿したら、たくさんの反響があった！"
+        description: "日常の写真をSNSに投稿したよ！ファンが増える"
     },
     street_snap: {
         title: "ストリートスナップに出会う",
@@ -164,37 +164,37 @@ const eventDetails = {
     // オーディション
     audition: {
         title: "公開オーディション",
-        description: "公開オーディションに参加して、多くの人にアピールした！"
+        description: "公開オーディションに参加したよ！ルーレットでファンの数が決まるよ"
     },
 
     // トラブル
     leg_injury: {
         title: "ケガ",
-        description: "レッスン中に足をケガしてしまった……"
+        description: "レッスン中に足をケガしてしまった…… ダンススキル-10"
     },
     throat_injury: {
         title: "喉のケガ",
-        description: "喉を痛めてしまい、歌うのが大変になってしまった……"
+        description: "喉を痛めてしまい、歌うのが大変になってしまった…… ボーカルスキル-10"
     },
     romance: {
-        title: "熱愛報道",
-        description: "熱愛報道が出てしまい、ファンが減ってしまった……"
+        title: "熱愛発覚",
+        description: "熱愛が発覚してしまった…… ファン-50人"
     },
     account_hacked: {
         title: "アカウント乗っ取り",
-        description: "SNSアカウントを乗っ取られてしまった……"
+        description: "SNSアカウントを乗っ取られてしまった…… ファン-30人"
     },
     flaming_sns: {
-        title: "SNS炎上",
-        description: "SNSで炎上してしまい、ファンが減ってしまった……"
+        title: "SNSで炎上する",
+        description: "SNSで炎上してしまった…… ファン-70人"
     },
     private_account_leak: {
         title: "裏アカウント流出",
-        description: "裏アカウントの情報が流出してしまった……"
+        description: "裏アカウントの情報が流出してしまった…… ファン-20人"
     },
     weight_gain: {
-        title: "太る",
-        description: "少し太ってしまい、ビジュアルスキルが下がってしまった……"
+        title: "体重が増える",
+        description: "少し太ってしまった…… ビジュアルスキル-10"
     }
 };
 
@@ -245,31 +245,31 @@ function applyEvent(player, event) {
 
         // ファン獲得系
         case "singing_video":
-            changeFans(player, 20);
+            changeFans(player, calculateFans(player.skills.vocal));
             break;
         case "street_live":
-            changeFans(player, 25);
+            changeFans(player, calculateFans(player.skills.vocal));
             break;
         case "local_event":
-            changeFans(player, 30);
+            changeFans(player, calculateFans(player.skills.vocal));
             break;
         case "dance_video":
-            changeFans(player, 20);
+            changeFans(player, calculateFans(player.skills.dance));
             break;
         case "dance_competition":
-            changeFans(player, 30);
+            changeFans(player, calculateFans(player.skills.dance));
             break;
         case "back_dancer":
-            changeFans(player, 40);
+            changeFans(player, calculateFans(player.skills.dance));
             break;
         case "daily_photo":
-            changeFans(player, 15);
+            changeFans(player, calculateFans(player.skills.visual));
             break;
         case "street_snap":
-            changeFans(player, 30);
+            changeFans(player, calculateFans(player.skills.visual));
             break;
         case "live_stream":
-            changeFans(player, 25);
+            changeFans(player, calculateFans(player.skills.visual));
             break;
         
         // オーディション系
@@ -285,21 +285,27 @@ function applyEvent(player, event) {
             changeSkillLevel(player, "vocal", -10);
             break;
         case "romance":
-            changeFans(player, -20);
-            break;
-        case "account_hacked":
-            changeFans(player, -20);
-            break;
-        case "flaming_sns":
             changeFans(player, -50);
             break;
+        case "account_hacked":
+            changeFans(player, -30);
+            break;
+        case "flaming_sns":
+            changeFans(player, -70);
+            break;
         case "private_account_leak":
-            changeFans(player, -20);
+            changeFans(player, -30);
             break;
         case "weight_gain":
             changeSkillLevel(player, "visual", -10);
             break;
     }
+}
+
+// ファンの数決め
+function calculateFans(skill) {
+    const fans = Math.floor(skill * 0.5);
+    return fans;
 }
 
 // イベントの詳細情報を取得する関数
