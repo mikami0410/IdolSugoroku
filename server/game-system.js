@@ -7,7 +7,7 @@
 //     DANCE_FAN = 6,
 //     VISUAL_FAN = 7,
 //     TROUBLE = 8,
-//     ORDITION = 9,
+//     AUDITION = 9,
 //     START = 10,
 //     GOAL = 11
 // }
@@ -38,7 +38,7 @@ const board = [
     { number: 17, type: 3 }, // visual lesson
     { number: 18, type: 4 }, // select lesson
     { number: 19, type: 8 }, // trouble
-    { number: 20, type: 9 }, // ordition
+    { number: 20, type: 9 }, // audition
 
     { number: 21, type: 7 }, // visual fan
     { number: 22, type: 8 }, // trouble
@@ -87,7 +87,7 @@ const visualFanEvents = [
     "live_stream"          // SNSでライブ配信をする
 ];
 
-const orditionEvents = [
+const auditionEvents = [
     "audition"             // オーディションに参加する
 ];
 
@@ -101,6 +101,102 @@ const troubleEvents = [
     "private_account_leak",
     "weight_gain"
 ];
+
+
+// イベントの詳細情報
+const eventDetails = {
+    // レッスン系
+    vocal_lesson: {
+        title: "ボーカルレッスン",
+        description: "歌のレッスンを受けて、ボーカルスキルが上がった！"
+    },
+    dance_lesson: {
+        title: "ダンスレッスン",
+        description: "ダンスのレッスンを受けて、ダンススキルが上がった！"
+    },
+    visual_lesson: {
+        title: "ビジュアルレッスン",
+        description: "メイクや表情の練習をして、ビジュアルスキルが上がった！"
+    },
+
+    // ボーカルファン
+    singing_video: {
+        title: "歌ってみた動画の投稿",
+        description: "歌ってみた動画を投稿したら、たくさんの人に見てもらえた！"
+    },
+    street_live: {
+        title: "路上ライブ",
+        description: "路上ライブを行い、新しいファンを獲得した！"
+    },
+    local_event: {
+        title: "地元のイベントに出演",
+        description: "地元のイベントに出演して、地域の人たちに知ってもらえた！"
+    },
+
+    // ダンスファン
+    dance_video: {
+        title: "ダンス動画の投稿",
+        description: "ダンス動画をSNSに投稿したら、動画が話題になった！"
+    },
+    dance_competition: {
+        title: "ダンス大会に出場",
+        description: "ダンス大会に出場して、観客から注目を集めた！"
+    },
+    back_dancer: {
+        title: "有名アーティストのバックダンサー",
+        description: "有名アーティストのバックダンサーを務め、多くの人に知ってもらえた！"
+    },
+
+    // ビジュアルファン
+    daily_photo: {
+        title: "日常写真の投稿",
+        description: "日常の写真をSNSに投稿したら、たくさんの反響があった！"
+    },
+    street_snap: {
+        title: "ストリートスナップに出会う",
+        description: "街でストリートスナップの撮影をしてもらい、注目を集めた！"
+    },
+    live_stream: {
+        title: "SNSでライブ配信",
+        description: "SNSでライブ配信を行い、新しいファンを獲得した！"
+    },
+
+    // オーディション
+    audition: {
+        title: "公開オーディション",
+        description: "公開オーディションに参加して、多くの人にアピールした！"
+    },
+
+    // トラブル
+    leg_injury: {
+        title: "ケガ",
+        description: "レッスン中に足をケガしてしまった……"
+    },
+    throat_injury: {
+        title: "喉のケガ",
+        description: "喉を痛めてしまい、歌うのが大変になってしまった……"
+    },
+    romance: {
+        title: "熱愛報道",
+        description: "熱愛報道が出てしまい、ファンが減ってしまった……"
+    },
+    account_hacked: {
+        title: "アカウント乗っ取り",
+        description: "SNSアカウントを乗っ取られてしまった……"
+    },
+    flaming_sns: {
+        title: "SNS炎上",
+        description: "SNSで炎上してしまい、ファンが減ってしまった……"
+    },
+    private_account_leak: {
+        title: "裏アカウント流出",
+        description: "裏アカウントの情報が流出してしまった……"
+    },
+    weight_gain: {
+        title: "太る",
+        description: "少し太ってしまい、ビジュアルスキルが下がってしまった……"
+    }
+};
 
 
 // ランダムイベントを取得する関数
@@ -126,7 +222,7 @@ function getRandomEventByType(type) {
         case 8:
             return getRandomEvent(troubleEvents);
         case 9:
-            return getRandomEvent(ordinationEvents);
+            return getRandomEvent(auditionEvents);
         default:
             return null;
     }
@@ -175,6 +271,8 @@ function applyEvent(player, event) {
         case "live_stream":
             changeFans(player, 25);
             break;
+        
+        // オーディション系
         case "audition":  // 後で変更予定
             changeFans(player, 50);
             break;
@@ -202,6 +300,11 @@ function applyEvent(player, event) {
             changeSkillLevel(player, "visual", -10);
             break;
     }
+}
+
+// イベントの詳細情報を取得する関数
+function getEventDetails(event) {
+    return eventDetails[event] || null;
 }
 
 function changeSkillLevel(player, skill, amount) {
@@ -290,6 +393,7 @@ function getNextTurnPlayer(room, playerId) {
 module.exports = {
     board,
     getRandomEventByType,
+    getEventDetails,
     applyEvent,
     createRanking,
     getBoardCell,
