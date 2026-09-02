@@ -2,12 +2,14 @@
 //     VOCAL_LESSON = 1,
 //     DANCE_LESSON = 2,
 //     VISUAL_LESSON = 3,
-//     VOCAL_FAN = 4,
-//     DANCE_FAN = 5,
-//     VISUAL_FAN = 6,
-//     TROUBLE = 7,
-//     START = 8,
-//     GOAL = 9
+//     SELECT_LESSON = 4,
+//     VOCAL_FAN = 5,
+//     DANCE_FAN = 6,
+//     VISUAL_FAN = 7,
+//     TROUBLE = 8,
+//     ORDITION = 9,
+//     START = 10,
+//     GOAL = 11
 // }
 
 const {
@@ -15,40 +17,40 @@ const {
 } = require("./player");
 
 const board = [
-    { number: 1, type: 8 }, // start
+    { number: 1, type: 10 }, // start
 
     { number: 2, type: 1 }, // vocal lesson
     { number: 3, type: 2 }, // dance lesson
-    { number: 4, type: 4 }, // vocal fan
+    { number: 4, type: 5 }, // vocal fan
     { number: 5, type: 3 }, // visual lesson
-    { number: 6, type: 5 }, // dance fan
-    { number: 7, type: 7 }, // trouble
-    { number: 8, type: 3 }, // visual lesson
-    { number: 9, type: 6 }, // visual fan
-    { number: 10, type: 7 }, // trouble
+    { number: 6, type: 6 }, // dance fan
+    { number: 7, type: 4 }, // select lesson
+    { number: 8, type: 8 }, // trouble
+    { number: 9, type: 4 }, // select lesson
+    { number: 10, type: 7 }, // visual fan
 
     { number: 11, type: 1 }, // vocal lesson
-    { number: 12, type: 4 }, // vocal fan
-    { number: 13, type: 7 }, // trouble
-    { number: 14, type: 2 }, // dance lesson
-    { number: 15, type: 5 }, // dance fan
-    { number: 16, type: 1 }, // vocal lesson
-    { number: 17, type: 2 }, // dance lesson
-    { number: 18, type: 6 }, // visual fan
-    { number: 19, type: 7 }, // trouble
-    { number: 20, type: 1 }, // 強制イベント予定
+    { number: 12, type: 5 }, // vocal fan
+    { number: 13, type: 2 }, // dance lesson
+    { number: 14, type: 4 }, // select lesson
+    { number: 15, type: 8 }, // trouble
+    { number: 16, type: 6 }, // dance fan
+    { number: 17, type: 3 }, // visual lesson
+    { number: 18, type: 4 }, // select lesson
+    { number: 19, type: 8 }, // trouble
+    { number: 20, type: 9 }, // ordition
 
-    { number: 21, type: 4 }, // vocal fan
-    { number: 22, type: 7 }, // trouble
-    { number: 23, type: 3 }, // visual lesson
-    { number: 24, type: 7 }, // trouble
-    { number: 25, type: 5 }, // dance fan
-    { number: 26, type: 7 }, // trouble
-    { number: 27, type: 6 }, // visual fan
-    { number: 28, type: 7 }, // trouble
-    { number: 29, type: 4 }, // vocal fan
+    { number: 21, type: 7 }, // visual fan
+    { number: 22, type: 8 }, // trouble
+    { number: 23, type: 4 }, // select lesson
+    { number: 24, type: 5 }, // vocal fan
+    { number: 25, type: 8 }, // trouble
+    { number: 26, type: 6 }, // dance fan
+    { number: 27, type: 8 }, // trouble
+    { number: 28, type: 8 }, // trouble
+    { number: 29, type: 7 }, // visual fan
 
-    { number: 30, type: 9 } // goal
+    { number: 30, type: 11 } // goal
 ];
 
 
@@ -85,6 +87,10 @@ const visualFanEvents = [
     "live_stream"          // SNSでライブ配信をする
 ];
 
+const orditionEvents = [
+    "audition"             // オーディションに参加する
+];
+
 // トラブル系
 const troubleEvents = [
     "leg_injury",
@@ -111,14 +117,16 @@ function getRandomEventByType(type) {
             return getRandomEvent(danceLessonEvents);
         case 3:
             return getRandomEvent(visualLessonEvents);
-        case 4:
-            return getRandomEvent(vocalFanEvents);
         case 5:
-            return getRandomEvent(danceFanEvents);
+            return getRandomEvent(vocalFanEvents);
         case 6:
-            return getRandomEvent(visualFanEvents);
+            return getRandomEvent(danceFanEvents);
         case 7:
+            return getRandomEvent(visualFanEvents);
+        case 8:
             return getRandomEvent(troubleEvents);
+        case 9:
+            return getRandomEvent(ordinationEvents);
         default:
             return null;
     }
@@ -166,6 +174,9 @@ function applyEvent(player, event) {
             break;
         case "live_stream":
             changeFans(player, 25);
+            break;
+        case "audition":  // 後で変更予定
+            changeFans(player, 50);
             break;
 
         // トラブル系
