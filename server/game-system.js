@@ -122,39 +122,39 @@ const eventDetails = {
     // ボーカルファン
     singing_video: {
         title: "歌ってみた動画の投稿",
-        description: "歌ってみた動画を投稿したよ！ファンが増える"
+        description: "歌ってみた動画を投稿した！ファンが増えるよ"
     },
     street_live: {
         title: "路上ライブ",
-        description: "路上ライブを行ったよ！ファンが増える"
+        description: "路上ライブを行った！ファンが増えるよ"
     },
     local_event: {
         title: "地元のイベントに出演",
-        description: "地元のイベントに出演したよ！ファンが増える"
+        description: "地元のイベントに出演した！ファンが増えるよ"
     },
 
     // ダンスファン
     dance_video: {
         title: "ダンス動画の投稿",
-        description: "ダンス動画をSNSに投稿したよ！ファンが増える"
+        description: "ダンス動画をSNSに投稿した！ファンが増えるよ"
     },
     dance_competition: {
         title: "ダンス大会に出場",
-        description: "ダンス大会に出場したよ！ファンが増える"
+        description: "ダンス大会に出場した！ファンが増えるよ"
     },
     back_dancer: {
         title: "有名アーティストのバックダンサー",
-        description: "有名アーティストのバックダンサーを務めたよ！ファンが増える"
+        description: "有名アーティストのバックダンサーを務めた！ファンが増えるよ"
     },
 
     // ビジュアルファン
     daily_photo: {
         title: "日常写真の投稿",
-        description: "日常の写真をSNSに投稿したよ！ファンが増える"
+        description: "日常の写真をSNSに投稿した！ファンが増えるよ"
     },
     street_snap: {
         title: "ストリートスナップに出会う",
-        description: "街でストリートスナップの撮影をしてもらい、注目を集めた！"
+        description: "街でストリートスナップの撮影をしてもらい、注目を集めた！ファンが増えるよ"
     },
     live_stream: {
         title: "SNSでライブ配信",
@@ -164,7 +164,7 @@ const eventDetails = {
     // オーディション
     audition: {
         title: "公開オーディション",
-        description: "公開オーディションに参加したよ！ルーレットでファンの数が決まるよ"
+        description: "公開オーディションに参加した！ルーレットでファンの数が決まるよ"
     },
 
     // トラブル
@@ -195,6 +195,42 @@ const eventDetails = {
     weight_gain: {
         title: "体重が増える",
         description: "少し太ってしまった…… ビジュアルスキル-10"
+    }
+};
+
+// オーディションのファンの数
+const auditionFanTable = {
+    S: {
+        1: 50,
+        2: 60,
+        3: 70,
+        4: 80,
+        5: 90,
+        6: 100
+    },
+    A: {
+        1: 30,
+        2: 40,
+        3: 50,
+        4: 60,
+        5: 70,
+        6: 80
+    },
+    B: {
+        1: 20,
+        2: 30,
+        3: 40,
+        4: 50,
+        5: 60,
+        6: 70
+    },
+    C: {
+        1: 10,
+        2: 20,
+        3: 30,
+        4: 40,
+        5: 50,
+        6: 60
     }
 };
 
@@ -273,7 +309,7 @@ function applyEvent(player, event) {
             break;
         
         // オーディション系
-        case "audition":  // 後で変更予定
+        case "audition":  // 後で変更予定、どうやってサーバで決まったファンの人数を持ってくるか
             changeFans(player, 50);
             break;
 
