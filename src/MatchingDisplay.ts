@@ -38,6 +38,8 @@ export class MatchingDisplay {
 
             this.playerNameElements.push(playerName);
         }
+        this.element.appendChild(playerList);
+
         // STARTボタン
         this.startButton = document.createElement("button");
         this.startButton.id = "matching-start-button";
@@ -57,7 +59,7 @@ export class MatchingDisplay {
     }
 
     public setRoomID(roomId: string): void {
-        this.roomIdElement.textContent = `RoomID${roomId}`;
+        this.roomIdElement.textContent = `RoomID:${roomId}`;
     }
 
     public setPlayerName(playerNumber: number, playerName: string): void {

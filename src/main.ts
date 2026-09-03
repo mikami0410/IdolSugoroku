@@ -52,6 +52,10 @@ async function main(): Promise<void> {
 
     titleDisplay.show();
 
+    // プレイヤー情報入れてみる
+    matchingDisplay.setRoomID("12345");
+    matchingDisplay.setPlayerName(0,"花子");
+
     // 背景隠す用
     const overlay = document.createElement("div");
     overlay.id = "overlay";
