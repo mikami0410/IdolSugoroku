@@ -11,6 +11,7 @@ export class StatusDisplay{
             throw new Error("game-containerが見つかりません");
         }
         gameContainer.appendChild(this.element);
+        this.hide();
     }
 
     public judgeRank(status: number): string{

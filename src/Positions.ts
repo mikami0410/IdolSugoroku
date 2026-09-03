@@ -57,7 +57,7 @@ export const eventTypes: EventType[] = [
     EventType.SELECT_LESSON,
     EventType.VISUAL_FAN,
     EventType.TROUBLE,
-    EventType.ORDITION,
+    EventType.AUDITION,
 
     EventType.VOCAL_FAN,
     EventType.TROUBLE,

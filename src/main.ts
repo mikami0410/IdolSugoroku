@@ -11,6 +11,8 @@ import { RouletteButton } from "./RouletteButton";
 import { RouletteDisplay } from "./RouletteDisplay";
 import { Koma } from "./koma";
 import { PositionOffset } from "./koma";
+import { TitleDisplay } from "./TitleDisplay";
+import { MatchingDisplay } from "./MatchingDisplay";
 import "./style.css";
 
 async function main(): Promise<void> {
@@ -25,6 +27,30 @@ async function main(): Promise<void> {
     const gameContainer = document.createElement("div");
     gameContainer.id = "game-container";
     document.body.appendChild(gameContainer);
+
+    // タイトル、マッチング画面
+    let matchingDisplay!: MatchingDisplay;
+
+    const titleDisplay = new TitleDisplay(
+        // 部屋を作る
+        ()=>{
+            console.log("部屋を作る");
+            titleDisplay.hide();
+            matchingDisplay.show();
+        },
+        // 部屋に入る
+        ()=>{
+            console.log("部屋に入る");
+            titleDisplay.hide();
+            matchingDisplay.show();
+        }
+    );
+    matchingDisplay = new MatchingDisplay(()=>{
+        console.log("ゲーム開始");
+        matchingDisplay.hide();
+    });
+
+    titleDisplay.show();
 
     // 背景隠す用
     const overlay = document.createElement("div");
@@ -77,7 +103,6 @@ async function main(): Promise<void> {
 
     // ステータス
     const statusDisplay = new StatusDisplay();
-    statusDisplay.show(player);
 
     const eventList: EventType[] = [
         EventType.VOCAL_LESSON,

@@ -147,3 +147,88 @@ canvas {
     display: none;
     z-index: 10;
 }
+
+/* マッチング画面 */
+#matching-display {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1280px;
+    height: 720px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #ececec;
+    z-index: 100;
+}
+
+.matching-room-id {
+    margin-top: 50px;
+    font-size: 40px;
+}
+
+.player-list {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    margin-top: 180px;
+}
+
+.player {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.player-name {
+    font-size: 40px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.player-status {
+    font-size: 35px;
+}
+
+#matching-start-button {
+    width: 280px;
+    height: 100px;
+    margin-top: 200px;
+    font-size: 40px;
+    cursor: pointer;
+}
+
+/* タイトル画面 */
+#title-display {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1280px;
+    height: 720px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #ececec;
+    z-index: 100;
+}
+
+.game-title {
+    font-size: 70px;
+    font-weight: bold;
+    margin-bottom: 80px;
+}
+
+.title-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+#create-room-button,
+#join-room-button {
+    width: 350px;
+    height: 80px;
+    font-size: 30px;
+    cursor: pointer;
+}

@@ -10,7 +10,7 @@ export enum EventType {
     DANCE_FAN,
     VISUAL_FAN,
     TROUBLE,
-    ORDITION,
+    AUDITION,
     START,
     GOAL
 }
@@ -78,7 +78,7 @@ export class Masu {
                 return "models/start.glb";
             case EventType.GOAL:
                 return "models/goal.glb";
-            case EventType.ORDITION:
+            case EventType.AUDITION:
                 return "models/start.glb";
             case EventType.TROUBLE:
                 return "models/trouble.glb";
