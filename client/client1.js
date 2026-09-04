@@ -120,10 +120,9 @@ socket.on("message", (message) => {
     console.log(
       data.playerName,
       "が",
-      data.cell.position,
+      data.cell.number,
       "番目のマスに止まりました"
     );
-
     console.log(
       "マスの種類:",
       data.cell.type

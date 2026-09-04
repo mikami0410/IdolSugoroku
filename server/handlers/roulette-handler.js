@@ -1,5 +1,6 @@
 const {
   getRandomEventByType,
+  getEventDetails,
   applyEvent,
   createRanking,
   getBoardCell,
@@ -112,19 +113,15 @@ function handleSpinRoulette({
   }
 
   let event = null;
+  let eventDetails = null;
 
-  // イベントマスの場合はイベントを発生させる
+  // 通常のイベントマスの場合はイベントを発生させる
   if (
     cell.type >= 1 &&
-    cell.type <= 7
+    cell.type <= 8
   ) {
     event = getRandomEventByType(
       cell.type
-    );
-
-    console.log(
-      "イベント前:",
-      player
     );
 
     if (event) {
@@ -132,9 +129,10 @@ function handleSpinRoulette({
         player,
         event
       );
+
+      eventDetails = getEventDetails(event);
     }
   }
-
   console.log(
     "イベント:",
     event
@@ -156,7 +154,11 @@ function handleSpinRoulette({
     playerId: playerId,
     playerName: player.name,
     cell: cell,
-    event: event
+    event: {
+      name: event,
+      title: eventDetails ? eventDetails.title : null,
+      description: eventDetails ? eventDetails.description : null
+    }
   });
 
   console.log(
@@ -189,9 +191,9 @@ function handleSpinRoulette({
     position: player.position
   });
 
-// 次のターンを設定
-room.currentTurn =
-  getNextTurnPlayer(room, playerId);
+  // 次のターンを設定
+  room.currentTurn =
+    getNextTurnPlayer(room, playerId);
 
   console.log(
     "次のターン:",
