@@ -10,6 +10,10 @@ const {
   handleSpinRoulette
 } = require("./roulette-handler");
 
+const {
+  handleAuditionRoll
+} = require("./audition-handler");
+
 // WebSocketメッセージ処理
 function handleMessage({
   socket,
@@ -63,6 +67,15 @@ function handleMessage({
   // ルーレット
   if (data.type === "spin_roulette") {
     handleSpinRoulette({
+      socket,
+      playerRooms,
+      broadcastToRoom
+    });
+  }
+
+  // オーディションルーレット
+  if (data.type === "audition_roll") {
+    handleAuditionRoll({
       socket,
       playerRooms,
       broadcastToRoom

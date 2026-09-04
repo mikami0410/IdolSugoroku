@@ -42,6 +42,18 @@ function handleSpinRoulette({
     return;
   }
 
+  // オーディション中の場合
+  if (room.auditionPlayerId === playerId) {
+    console.log(
+      "オーディション中:",
+      player.name,
+      "現在の回数:",
+      room.auditionRound
+    );
+
+    return;
+  }
+
   // すでにゴールしている場合は処理しない
   if (player.finished) {
     socket.send(JSON.stringify({
@@ -67,7 +79,17 @@ function handleSpinRoulette({
     Math.floor(Math.random() * 6) + 1;
 
   // プレイヤーを移動
+  const previousPosition = player.position;
+
   player.position += rouletteValue;
+
+  // 20マスを初めて超えた場合は20マスに止まる
+  if (
+    previousPosition < 20 &&
+    player.position > 20
+  ) {
+    player.position = 20;
+  }
 
   // 30マス以上ならゴール
   if (player.position >= 30) {
@@ -147,6 +169,27 @@ function handleSpinRoulette({
     "止まったマス:",
     cell
   );
+
+  // オーディションマスに止まった場合
+  if (cell.type === 9) {
+    room.auditionPlayerId = playerId;
+    room.auditionRound = 0;
+    room.auditionRolls = [];
+
+    console.log(
+      "オーディション開始:",
+      player.name
+    );
+
+    broadcastToRoom(roomId, {
+      type: "audition_start",
+      playerId: playerId,
+      playerName: player.name
+    });
+
+    // オーディション中なので通常のターン処理を終了
+    return;
+  }
 
   // マスイベントを全プレイヤーに通知
   broadcastToRoom(roomId, {

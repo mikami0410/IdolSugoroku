@@ -7,6 +7,9 @@ function createRoom(roomId) {
       players: [],                  // ルームに参加しているプレイヤーID
       currentTurn: null,            // 現在のターンのプレイヤーID
       turnOrder: [],                // ゲーム中のターン順
+      auditionPlayerId: null,       // オーディション中のプレイヤー
+      auditionRound: 0,             // 現在何回目か
+      auditionRolls: [],            // これまでの出目
       gameStarted: false,           // ゲームが開始しているか
       gameStarting: false           // ゲーム開始処理中か
     };

@@ -5,6 +5,8 @@ const socket = new WebSocket("ws://localhost:8080");
 let playerId;
 let currentTurn = null;
 let finished = false;
+let auditionPlayerId = null;
+let auditionRound = 0;
 
 socket.on("open", () => {
   console.log("サーバーに接続しました");
@@ -135,6 +137,89 @@ socket.on("message", (message) => {
     );
   }
 
+  // オーディション開始
+  if (data.type === "audition_start") {
+    auditionPlayerId = data.playerId;
+    auditionRound = 0;
+
+    console.log(
+      data.playerName,
+      "のオーディション開始"
+    );
+
+    if (data.playerId === playerId) {
+      console.log(
+        "オーディションです。Enterを押してください。"
+      );
+    }
+
+    return;
+  }
+
+  // オーディションルーレット結果
+  if (data.type === "audition_roll_result") {
+    auditionRound = data.round;
+
+    console.log(
+      data.playerName,
+      "のオーディション",
+      data.round + "回目:",
+      data.value
+    );
+
+    return;
+  }
+
+  if (data.type === "audition_result") {
+    console.log(
+      "========================"
+    );
+
+    console.log(
+      data.playerName,
+      "のオーディション結果"
+    );
+
+    console.log(
+      "ボーカル:",
+      data.result.vocal,
+      "人"
+    );
+
+    console.log(
+      "ダンス:",
+      data.result.dance,
+      "人"
+    );
+
+    console.log(
+      "ビジュアル:",
+      data.result.visual,
+      "人"
+    );
+
+    console.log(
+      "合計:",
+      data.result.total,
+      "人"
+    );
+
+    console.log(
+      "現在のファン数:",
+      data.fans,
+      "人"
+    );
+
+    console.log(
+      "========================"
+    );
+
+    auditionPlayerId = null;
+    auditionRound = 0;
+
+    return;
+  }
+
   //ゲーム終了
   if (data.type === "game_finished") {
     console.log("==========");
@@ -167,6 +252,20 @@ process.stdin.setEncoding("utf8");
 process.stdin.on("data", (key) => {
 
   if (key === "\r") {
+
+    // オーディション中
+    if (auditionPlayerId === playerId) {
+      console.log(
+        "オーディションルーレットを回します"
+      );
+
+      socket.send(JSON.stringify({
+        type: "audition_roll"
+      }));
+
+      return;
+    }
+
     // 通常のゲーム
     if (finished) {
       console.log("すでにゴールしています");

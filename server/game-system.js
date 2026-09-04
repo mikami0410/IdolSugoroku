@@ -380,6 +380,29 @@ function getSkillRank(value) {
     }
 }
 
+// オーディションのファン数を計算
+function calculateAuditionFans(player, rolls) {
+    const vocalRank = getSkillRank(player.skills.vocal);
+    const danceRank = getSkillRank(player.skills.dance);
+    const visualRank = getSkillRank(player.skills.visual);
+
+    const vocalFans =
+        auditionFanTable[vocalRank][rolls[0]];
+
+    const danceFans =
+        auditionFanTable[danceRank][rolls[1]];
+
+    const visualFans =
+        auditionFanTable[visualRank][rolls[2]];
+
+    return {
+        vocal: vocalFans,
+        dance: danceFans,
+        visual: visualFans,
+        total: vocalFans + danceFans + visualFans
+    };
+}
+
 // 現在位置に対応するマスの情報を取得
 function getBoardCell(position) {
     return board.find(
@@ -439,5 +462,6 @@ module.exports = {
     applyEvent,
     createRanking,
     getBoardCell,
-    getNextTurnPlayer
+    getNextTurnPlayer,
+    calculateAuditionFans
 };
