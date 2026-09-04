@@ -6,11 +6,6 @@ function createRoom(roomId) {
     rooms[roomId] = {
       players: [],                  // ルームに参加しているプレイヤーID
       currentTurn: null,            // 現在のターンのプレイヤーID
-      orderRolls: {},               // 順番決定ルーレットの現在の結果
-      orderRollGroups: [],          // 順番決定時の順位グループ
-      orderRollCurrentGroup: [],    // 現在回し直しているグループ
-      orderRollRerolling: false,    // 順番決定ルーレットの回し直し中か
-      orderRollResults: {},         // 順番決定ルーレットの最終結果
       turnOrder: [],                // ゲーム中のターン順
       gameStarted: false,           // ゲームが開始しているか
       gameStarting: false           // ゲーム開始処理中か

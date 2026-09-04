@@ -5,7 +5,6 @@ const socket = new WebSocket("ws://localhost:8080");
 let playerId;
 let currentTurn = null;
 let finished = false;
-let orderRollReady = false;
 
 socket.on("open", () => {
   console.log("サーバーに接続しました");
@@ -34,32 +33,6 @@ socket.on("message", (message) => {
     console.log(
       "プレイヤーが参加しました:",
       data.player.name
-    );
-  }
-
-
-  //順番決定開始
-  if (data.type === "order_roll_start") {
-
-    if (
-      data.playerIds &&
-      !data.playerIds.includes(playerId)
-    ) {
-      return;
-    }
-
-    orderRollReady = true;
-
-    console.log("順番決定ルーレットを回せます。Enterを押してください。");
-  }
-
-
-  // 順番決定ルーレット
-  if (data.type === "order_roll_result") {
-    console.log(
-      "順番決定ルーレット:",
-      data.playerName,
-      data.value
     );
   }
 
@@ -194,22 +167,6 @@ process.stdin.setEncoding("utf8");
 process.stdin.on("data", (key) => {
 
   if (key === "\r") {
-
-    // 順番決定ルーレット
-    if (orderRollReady) {
-
-      console.log("順番決定ルーレットを回します");
-
-      socket.send(JSON.stringify({
-        type: "order_roll"
-      }));
-
-      orderRollReady = false;
-
-      return;
-    }
-
-    
     // 通常のゲーム
     if (finished) {
       console.log("すでにゴールしています");

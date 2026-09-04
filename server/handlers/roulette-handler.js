@@ -62,11 +62,11 @@ function handleSpinRoulette({
   }
 
   // ルーレットを回す
-  const dice =
+  const rouletteValue =
     Math.floor(Math.random() * 6) + 1;
 
   // プレイヤーを移動
-  player.position += dice;
+  player.position += rouletteValue;
 
   // 30マス以上ならゴール
   if (player.position >= 30) {
@@ -163,7 +163,7 @@ function handleSpinRoulette({
     "プレイヤー",
     playerId,
     "のルーレットの結果:",
-    dice
+    rouletteValue
   );
 
   console.log(
@@ -178,7 +178,7 @@ function handleSpinRoulette({
     type: "roulette_result",
     playerId: playerId,
     playerName: player.name,
-    value: dice
+    value: rouletteValue
   });
 
   // プレイヤー移動を全プレイヤーに通知
@@ -189,9 +189,9 @@ function handleSpinRoulette({
     position: player.position
   });
 
-  // 次のターンを設定
-  room.currentTurn =
-    getNextTurnPlayer(room, playerId);
+// 次のターンを設定
+room.currentTurn =
+  getNextTurnPlayer(room, playerId);
 
   console.log(
     "次のターン:",

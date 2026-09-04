@@ -1,19 +1,7 @@
 const {
-  getPlayer
-} = require("../player");
-
-const {
-  getRoom
-} = require("../room");
-
-const {
-  spinOrderRoulette,
+  spinOrder,
   resolveOrder
 } = require("../order-system");
-
-const {
-  createGameState
-} = require("../game-state");
 
 // サーバー内部で順番を自動決定する
 function decideOrder(room) {
@@ -21,7 +9,7 @@ function decideOrder(room) {
 
   // 全プレイヤーのルーレット結果を決める
   for (const playerId of room.players) {
-    const result = spinOrderRoulette(playerId);
+    const result = spinOrder(playerId);
 
     results[playerId] = result.value;
 
