@@ -7,10 +7,6 @@ const {
 } = require("./game-handler");
 
 const {
-  handleOrderRoll
-} = require("./order-handler");
-
-const {
   handleSpinRoulette
 } = require("./roulette-handler");
 
@@ -58,15 +54,6 @@ function handleMessage({
   // ゲーム開始
   if (data.type === "start_game") {
     handleStartGame({
-      socket,
-      playerRooms,
-      broadcastToRoom
-    });
-  }
-
-  // 順番決定
-  if (data.type === "order_roll") {
-    handleOrderRoll({
       socket,
       playerRooms,
       broadcastToRoom

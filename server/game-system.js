@@ -307,7 +307,7 @@ function applyEvent(player, event) {
         case "live_stream":
             changeFans(player, calculateFans(player.skills.visual));
             break;
-        
+
         // オーディション系
         case "audition":  // 後で変更予定、どうやってサーバで決まったファンの人数を持ってくるか
             changeFans(player, 50);
@@ -315,7 +315,7 @@ function applyEvent(player, event) {
 
         // トラブル系
         case "leg_injury":
-            changeSkillLevel(player, "dance", -10);
+            changeSkillLevel(player, "adance", -10);
             break;
         case "throat_injury":
             changeSkillLevel(player, "vocal", -10);

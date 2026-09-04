@@ -189,9 +189,9 @@ function handleSpinRoulette({
     position: player.position
   });
 
-// 次のターンを設定
-room.currentTurn =
-  getNextTurnPlayer(room, playerId);
+  // 次のターンを設定
+  room.currentTurn =
+    getNextTurnPlayer(room, playerId);
 
   console.log(
     "次のターン:",

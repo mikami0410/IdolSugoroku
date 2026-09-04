@@ -6,6 +6,14 @@ const {
   createGameState
 } = require("../game-state");
 
+const {
+  decideOrder
+} = require("./order-handler");
+
+const {
+  getPlayer
+} = require("../player");
+
 // ゲーム開始処理
 function handleStartGame({
   socket,
@@ -49,22 +57,38 @@ function handleStartGame({
     roomId
   );
 
-  // 順番決定用のデータを初期化
-  room.orderRolls = {};
-  room.orderRollResults = {};
-  room.orderRollGroups = [];
-  room.orderRollCurrentGroup = [];
-  room.orderRollRerolling = false;
+  // サーバー内部で順番を自動決定
+  broadcastToRoom(roomId, {
+    type: "order_deciding"
+  });
 
-  // 現在のゲーム状態を全プレイヤーに通知
+  decideOrder(room);
+
+  // ゲーム開始
+  room.gameStarted = true;
+  room.gameStarting = false;
+
+  // 最初のターンを設定
+  room.currentTurn = room.turnOrder[0];
+
+  // ゲーム状態を全プレイヤーに通知
   broadcastToRoom(roomId, {
     type: "game_state",
     state: createGameState(room)
   });
 
-  // 順番決定ルーレットの開始を全プレイヤーに通知
+  // 順番決定結果を全プレイヤーに通知
   broadcastToRoom(roomId, {
-    type: "order_roll_start"
+    type: "order_decided",
+    turnOrder: room.turnOrder
+  });
+
+  // 最初のターンを通知
+  broadcastToRoom(roomId, {
+    type: "turn_changed",
+    playerId: room.currentTurn,
+    playerName:
+      getPlayer(room.currentTurn).name
   });
 }
 

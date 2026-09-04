@@ -1,7 +1,7 @@
 // ゲーム開始時のプレイヤーの順番を決定
 
 // 順番決定ルーレットを回す
-function rollOrder(playerId) {
+function spinOrderRoulette(playerId) {
   const value = Math.floor(Math.random() * 6) + 1;
 
   return {
@@ -175,7 +175,7 @@ function resolveOrder(results, groups = null) {
 }
 
 module.exports = {
-  rollOrder,
+  spinOrderRoulette,
   createOrderGroups,
   getDuplicatePlayers,
   getAllDuplicatePlayers,
