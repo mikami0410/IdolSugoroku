@@ -112,6 +112,10 @@ export class Roulette {
         return this.deme;
     }
 
+    public setDeme(deme: number): void{
+        this.deme = deme;
+    }
+
     public setRollingEnd(callback: (deme: number)=>void): void{
         this.rollingEnd = callback;
     }
