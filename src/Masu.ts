@@ -79,11 +79,11 @@ export class Masu {
             case EventType.GOAL:
                 return "models/goal.glb";
             case EventType.AUDITION:
-                return "models/start.glb";
+                return "models/audition.glb";
             case EventType.TROUBLE:
                 return "models/trouble.glb";
             case EventType.SELECT_LESSON:
-                return "models/vocal_lesson.glb";
+                return "models/select_lesson.glb";
             default:
                 throw new Error("存在しないEventType : " + this.eventType);
         }
