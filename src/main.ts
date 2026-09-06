@@ -14,6 +14,8 @@ import { PositionOffset } from "./koma";
 import { TitleDisplay } from "./TitleDisplay";
 import { MatchingDisplay } from "./MatchingDisplay";
 import "./style.css";
+import { RoomIDDisplay } from "./RoomIdDisplay";
+import { PlayerNameDisplay } from "./PlayerNameDisplay";
 
 async function main(): Promise<void> {
     // プレイヤー
@@ -28,21 +30,22 @@ async function main(): Promise<void> {
     gameContainer.id = "game-container";
     document.body.appendChild(gameContainer);
 
-    // タイトル、マッチング画面
+    // タイトル、マッチング画面、ルームID画面
     let matchingDisplay!: MatchingDisplay;
-
+    let roomIDDisplay!: RoomIDDisplay;
+    let playerNameDisplay!: PlayerNameDisplay;
     const titleDisplay = new TitleDisplay(
         // 部屋を作る
         ()=>{
             console.log("部屋を作る");
             titleDisplay.hide();
-            matchingDisplay.show();
+            playerNameDisplay.show();
         },
         // 部屋に入る
         ()=>{
             console.log("部屋に入る");
             titleDisplay.hide();
-            matchingDisplay.show();
+            roomIDDisplay.show();
         }
     );
     matchingDisplay = new MatchingDisplay(()=>{
@@ -50,11 +53,23 @@ async function main(): Promise<void> {
         matchingDisplay.hide();
     });
 
+    roomIDDisplay = new RoomIDDisplay((roomId) =>{
+        roomIDDisplay.hide();
+        matchingDisplay.setRoomID(roomId);
+        playerNameDisplay.show();
+    });
+    playerNameDisplay = new PlayerNameDisplay((playerName) => {
+    console.log("プレイヤー名:", playerName);
+    player.setName(playerName);
+    playerNameDisplay.hide();
+
+    // マッチング画面へ
+    matchingDisplay.setPlayerName(0, player.getName());
+    matchingDisplay.show();
+});
+
     titleDisplay.show();
 
-    // プレイヤー情報入れてみる
-    matchingDisplay.setRoomID("12345");
-    matchingDisplay.setPlayerName(0,"花子");
 
     // 背景隠す用
     const overlay = document.createElement("div");

@@ -58,4 +58,8 @@ export class Player{
     public setMasuNumber(masuNum: number): void{
         this.masuNumber = masuNum;
     }
+
+    public setName(name: string): void{
+        this.name = name;
+    }
 }
