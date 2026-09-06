@@ -59,7 +59,6 @@ async function main(): Promise<void> {
         playerNameDisplay.show();
     });
     playerNameDisplay = new PlayerNameDisplay((playerName) => {
-    console.log("プレイヤー名:", playerName);
     player.setName(playerName);
     playerNameDisplay.hide();
 
@@ -69,7 +68,6 @@ async function main(): Promise<void> {
 });
 
     titleDisplay.show();
-
 
     // 背景隠す用
     const overlay = document.createElement("div");
