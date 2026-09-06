@@ -26,7 +26,7 @@ export class MatchingDisplay {
 
             const playerNumber = document.createElement("div");
             playerNumber.className = "player-name";
-            playerNumber.textContent = `プレイヤー${i + 1}`;
+            // playerNumber.textContent = `プレイヤー${i + 1}`;
 
             const playerName = document.createElement("div");
             playerName.className = "player-status";
