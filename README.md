@@ -5,3 +5,13 @@
 ```
 npm install ws
 ```
+
+### UIのimportエラーをなくすとき
+```
+npm install three
+```
+
+### Three.jsの立ち上げ方
+```
+npm run dev
+```
