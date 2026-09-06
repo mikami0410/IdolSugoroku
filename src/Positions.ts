@@ -1,0 +1,106 @@
+import { EventType } from "./Masu";
+
+// マス
+export const masuPosition: [number, number][] =[
+    [-22, -13],
+    [-17, -14],
+    [-12, -14.8],
+    [-7, -14],
+    [-2, -13.5],
+    [3, -15],
+    [8, -14],
+    [13, -13.5],
+    [19, -14],
+    [23, -11],
+    [24, -5],
+    [22, 1.5],
+    [17, 3.5],
+    [11.5, 4],
+    [6, 5],
+    [1, 4],
+    [-4, 5],
+    [-9.5, 4.7],
+    [-15, 4],
+    [-20, 3],
+    [-23, -2],
+    [-21, -7],
+    [-17, -9],
+    [-12, -8.5],
+    [-7, -6],
+    [-3, -3],
+    [2, -3.5],
+    [7, -4],
+    [12, -5],
+    [17, -8]
+];
+
+// マスの内容
+export const eventTypes: EventType[] = [
+    EventType.START,
+
+    EventType.VOCAL_LESSON,
+    EventType.DANCE_LESSON,
+    EventType.VOCAL_FAN,
+    EventType.VISUAL_LESSON,
+    EventType.DANCE_FAN,
+    EventType.TROUBLE,
+    EventType.SELECT_LESSON,
+    EventType.VISUAL_FAN,
+    EventType.TROUBLE,
+
+    EventType.VOCAL_LESSON,
+    EventType.VOCAL_FAN,
+    EventType.TROUBLE,
+    EventType.DANCE_LESSON,
+    EventType.DANCE_FAN,
+    EventType.VISUAL_LESSON,
+    EventType.SELECT_LESSON,
+    EventType.VISUAL_FAN,
+    EventType.TROUBLE,
+    EventType.AUDITION,
+
+    EventType.VOCAL_FAN,
+    EventType.TROUBLE,
+    EventType.VOCAL_LESSON,
+    EventType.TROUBLE,
+    EventType.DANCE_FAN,
+    EventType.TROUBLE,
+    EventType.VISUAL_FAN,
+    EventType.TROUBLE,
+    EventType.VOCAL_FAN,
+
+    EventType.GOAL
+]
+
+// 道の方向
+export const roadDirection: [number, number][] = [
+    [0, -1],
+    [0, 1],
+    [0, -0.8],
+    [0, 1],
+    [0, -0.4],
+    [0, -0.6],
+    [0, 0.6],
+    [0, -1],
+    [0.3, -0.6],
+    [0.4, 0],
+    [-0.5, 0],
+    [0, 0.4],
+    [0, -0.6],
+    [0, -0.6],
+    [0, -0.5],
+    [0, -1],
+    [0, -1],
+    [0, -0.8],
+    [0, -1],
+    [0.7, -0.2],
+    [-0.6, 0],
+    [0, 0.7],
+    [0, -1],
+    [0, -0.6],
+    [0, 0.6],
+    [0, -1],
+    [0, 1],
+    [0, -0.7],
+    [0, -0.6]
+];
