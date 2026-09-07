@@ -76,4 +76,34 @@ export class MatchingDisplay {
     public hide(): void {
         this.element.style.display = "none";
     }
+
+    public setPlayers(
+        players: { id: number; name: string }[],
+        myPlayerId: number
+    ): void {
+        for (let i = 0; i < this.playerNameElements.length; i++) {
+            this.playerNameElements[i].textContent = "???";
+        }
+
+        const sortedPlayers = [...players].sort((a, b) => {
+            if (a.id === myPlayerId) {
+                return -1;
+            }
+
+            if (b.id === myPlayerId) {
+                return 1;
+            }
+
+            return a.id - b.id;
+        });
+
+        for (
+            let i = 0;
+            i < sortedPlayers.length && i < this.playerNameElements.length;
+            i++
+        ) {
+            this.playerNameElements[i].textContent =
+                sortedPlayers[i].name;
+        }
+    }
 }

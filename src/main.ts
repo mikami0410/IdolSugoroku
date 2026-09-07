@@ -16,8 +16,85 @@ import { MatchingDisplay } from "./MatchingDisplay";
 import "./style.css";
 import { RoomIDDisplay } from "./RoomIdDisplay";
 import { PlayerNameDisplay } from "./PlayerNameDisplay";
+import { WebSocketClient } from "./WebSocketClient";
 
 async function main(): Promise<void> {
+    // タイトル、マッチング画面、ルームID画面
+    let matchingDisplay!: MatchingDisplay;
+    let roomIDDisplay!: RoomIDDisplay;
+    let playerNameDisplay!: PlayerNameDisplay;
+    let isCreatingRoom = false;
+    let roomId = "";
+    let players: { id: number; name: string }[] = [];
+    let myPlayerId = 0;
+
+    const wsClient = new WebSocketClient(
+        "ws://localhost:8080",
+        (data) => {
+            if (data.type === "room_created") {
+                console.log("ルームを作成しました");
+                console.log("ルームID:", data.roomId);
+
+                roomId = data.roomId;
+                myPlayerId = data.playerId;
+
+                players = [
+                    {
+                        id: data.playerId,
+                        name: data.playerName
+                    }
+                ];
+
+                matchingDisplay.setRoomID(data.roomId);
+                matchingDisplay.setPlayers(players, myPlayerId);
+            }
+
+            if (data.type === "room_joined") {
+                console.log("ルームに参加しました");
+                console.log("ルームID:", data.roomId);
+
+                myPlayerId = data.playerId;
+
+                players = data.players;
+
+                matchingDisplay.setPlayers(
+                    players,
+                    myPlayerId
+                );
+            }
+
+            if (data.type === "player_joined") {
+                console.log(
+                    "プレイヤーが参加しました:",
+                    data.player.name
+                );
+
+                const alreadyExists = players.some(
+                    (player) => player.id === data.player.id
+                );
+
+                if (!alreadyExists) {
+                    players.push({
+                        id: data.player.id,
+                        name: data.player.name
+                    });
+                }
+
+                matchingDisplay.setPlayers(
+                    players,
+                    myPlayerId
+                );
+            }
+
+            if (data.type === "error") {
+                console.error(
+                    "エラー:",
+                    data.message
+                );
+            }
+        }
+    );
+
     // プレイヤー
     const player = new Player("testPlayer");
     player.setFan(100);
@@ -30,42 +107,46 @@ async function main(): Promise<void> {
     gameContainer.id = "game-container";
     document.body.appendChild(gameContainer);
 
-    // タイトル、マッチング画面、ルームID画面
-    let matchingDisplay!: MatchingDisplay;
-    let roomIDDisplay!: RoomIDDisplay;
-    let playerNameDisplay!: PlayerNameDisplay;
     const titleDisplay = new TitleDisplay(
         // 部屋を作る
-        ()=>{
+        () => {
             console.log("部屋を作る");
+            isCreatingRoom = true;
             titleDisplay.hide();
             playerNameDisplay.show();
         },
         // 部屋に入る
-        ()=>{
+        () => {
             console.log("部屋に入る");
+            isCreatingRoom = false;
             titleDisplay.hide();
             roomIDDisplay.show();
         }
     );
-    matchingDisplay = new MatchingDisplay(()=>{
+    matchingDisplay = new MatchingDisplay(() => {
         console.log("ゲーム開始");
         matchingDisplay.hide();
     });
 
-    roomIDDisplay = new RoomIDDisplay((roomId) =>{
+    roomIDDisplay = new RoomIDDisplay((inputRoomId) => {
+        roomId = inputRoomId;
         roomIDDisplay.hide();
         matchingDisplay.setRoomID(roomId);
         playerNameDisplay.show();
     });
     playerNameDisplay = new PlayerNameDisplay((playerName) => {
-    player.setName(playerName);
-    playerNameDisplay.hide();
+        player.setName(playerName);
+        playerNameDisplay.hide();
 
-    // マッチング画面へ
-    matchingDisplay.setPlayerName(0, player.getName());
-    matchingDisplay.show();
-});
+        if (isCreatingRoom) {
+            wsClient.createRoom(playerName);
+        } else {
+            wsClient.joinRoom(playerName, roomId);
+        }
+
+        // マッチング画面へ
+        matchingDisplay.show();
+    });
 
     titleDisplay.show();
 
@@ -177,22 +258,22 @@ async function main(): Promise<void> {
         const nextMasu = Math.min(currentMasu + deme, masus.length - 1);
         for (let i = 0; i < deme; i++) {
             setTimeout(() => {
-                if(currentMasu < nextMasu){
-                    currentMasu ++;
+                if (currentMasu < nextMasu) {
+                    currentMasu++;
                     koma1.setPosition(masus[currentMasu]);
                 }
-            }, 1000*(i+1));
+            }, 1000 * (i + 1));
         }
         setTimeout(() => {
             player.setMasuNumber(nextMasu);
             rouletteDisplay.hide();
             descriptionDisplay.show(masus[player.getMasuNumber()]);
-        }, (deme+1)*1000);
+        }, (deme + 1) * 1000);
 
         setTimeout(() => {
             descriptionDisplay.hide();
             statusDisplay.show(player);
-        }, (deme+1)*1000 + 4000);
+        }, (deme + 1) * 1000 + 4000);
     });
 
     // 描画

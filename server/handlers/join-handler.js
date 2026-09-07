@@ -57,6 +57,7 @@ function addPlayer(
 
   // Socketとプレイヤーを紐付け
   socket.playerId = playerId;
+  socket.playerName = player.name;
 
   sockets[playerId] = socket;
   playerRooms[playerId] = roomId;
@@ -208,12 +209,23 @@ function handleJoinRoom(
     return;
   }
 
+  // 現在ルームにいるプレイヤー一覧
+  const players = room.players.map((playerId) => {
+    const playerSocket = context.sockets[playerId];
+
+    return {
+      id: playerId,
+      name: playerSocket.playerName
+    };
+  });
+
   // 自分に参加情報を送信
   socket.send(JSON.stringify({
     type: "room_joined",
     roomId: roomId,
     playerId: player.id,
-    playerName: player.name
+    playerName: player.name,
+    players: players
   }));
 
   // ルーム全員に通知
