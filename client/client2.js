@@ -12,9 +12,9 @@ socket.on("open", () => {
   console.log("サーバーに接続しました");
 
   socket.send(JSON.stringify({
-    type: "join",
+    type: "join_room",
     name: "たろう",
-    roomId: "room1"
+    roomId: "2956"
   }));
 });
 

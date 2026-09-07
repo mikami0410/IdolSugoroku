@@ -1,5 +1,6 @@
 const {
-  handleJoin
+  handleCreateRoom,
+  handleJoinRoom
 } = require("./join-handler");
 
 const {
@@ -46,9 +47,18 @@ function handleMessage({
     return;
   }
 
+  // ルーム作成
+  if (data.type === "create_room") {
+    handleCreateRoom(socket, data, {
+      sockets,
+      playerRooms,
+      broadcastToRoom
+    });
+  }
+
   // ルーム参加
-  if (data.type === "join") {
-    handleJoin(socket, data, {
+  if (data.type === "join_room") {
+    handleJoinRoom(socket, data, {
       sockets,
       playerRooms,
       broadcastToRoom

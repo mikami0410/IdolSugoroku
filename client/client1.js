@@ -12,9 +12,8 @@ socket.on("open", () => {
   console.log("サーバーに接続しました");
 
   socket.send(JSON.stringify({
-    type: "join",
-    name: "はなこ",
-    roomId: "room1"
+    type: "create_room",
+    name: "はなこ"
   }));
 });
 
@@ -22,6 +21,16 @@ socket.on("message", (message) => {
   const data = JSON.parse(message.toString());
 
   console.log("サーバーから受信:", data);
+
+  //ルーム作成
+  if (data.type === "room_created") {
+    playerId = data.playerId;
+
+    console.log("ルームを作成しました");
+    console.log("ルームID:", data.roomId);
+    console.log("プレイヤーID:", data.playerId);
+    console.log("プレイヤー名:", data.playerName);
+  }
 
   // プレイヤーID
   if (data.type === "player_info") {
