@@ -5,6 +5,8 @@ export class Player{
     private dance: number;
     private visual: number;
     private masuNumber: number;
+    private isCurrentTurn: boolean;
+    private finished: boolean;
 
     constructor(name: string){
         this.name = name;
@@ -13,10 +15,16 @@ export class Player{
         this.dance = 0;
         this.visual = 0;
         this.masuNumber = 0;
+        this.isCurrentTurn = false;
+        this.finished = false;
     }
 
     public getName(): string{
         return this.name;
+    }
+
+    public setName(name: string): void{
+        this.name = name;
     }
 
     public getFan(): number{
@@ -59,7 +67,19 @@ export class Player{
         this.masuNumber = masuNum;
     }
 
-    public setName(name: string): void{
-        this.name = name;
+    public getIsCurrentTurn(): boolean{
+        return this.isCurrentTurn;
+    }
+
+    public setIsCurrentTurn(isCurrent: boolean): void{
+        this.isCurrentTurn = isCurrent;
+    }
+
+    public getFinished(): boolean{
+        return this.finished;
+    }
+
+    public setFinished(finished: boolean): void{
+        this.finished = finished;
     }
 }
