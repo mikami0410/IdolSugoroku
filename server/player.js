@@ -11,7 +11,7 @@ function createPlayer(name) {
     id: playerId,       // プレイヤーID
     name: name,         // 名前
     fans: 0,            // ファン数
-    position: 1,        // 現在地
+    position: 0,        // 現在地
     finished: false,    // ゴールしているか
     skills: {           // スキル
       vocal: 0,         // 歌

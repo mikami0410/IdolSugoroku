@@ -85,15 +85,15 @@ function handleSpinRoulette({
 
   // 20マスを初めて超えた場合は20マスに止まる
   if (
-    previousPosition < 20 &&
-    player.position > 20
+    previousPosition < 19 &&
+    player.position > 19
   ) {
-    player.position = 20;
+    player.position = 19;
   }
 
-  // 30マス以上ならゴール
-  if (player.position >= 30) {
-    player.position = 30;
+  // 29マス以上ならゴール
+  if (player.position >= 29) {
+    player.position = 29;
     player.finished = true;
   }
 
