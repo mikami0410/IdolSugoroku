@@ -17,40 +17,40 @@ const {
 } = require("./player");
 
 const board = [
-    { number: 1, type: 10 }, // start
+    { number: 0, type: 10 }, // start
 
-    { number: 2, type: 1 }, // vocal lesson
-    { number: 3, type: 2 }, // dance lesson
-    { number: 4, type: 5 }, // vocal fan
-    { number: 5, type: 3 }, // visual lesson
-    { number: 6, type: 6 }, // dance fan
-    { number: 7, type: 4 }, // select lesson
-    { number: 8, type: 8 }, // trouble
-    { number: 9, type: 4 }, // select lesson
-    { number: 10, type: 7 }, // visual fan
+    { number: 1, type: 1 }, // vocal lesson
+    { number: 2, type: 2 }, // dance lesson
+    { number: 3, type: 5 }, // vocal fan
+    { number: 4, type: 3 }, // visual lesson
+    { number: 5, type: 6 }, // dance fan
+    { number: 6, type: 4 }, // select lesson
+    { number: 7, type: 8 }, // trouble
+    { number: 8, type: 4 }, // select lesson
+    { number: 9, type: 7 }, // visual fan
 
-    { number: 11, type: 1 }, // vocal lesson
-    { number: 12, type: 5 }, // vocal fan
-    { number: 13, type: 2 }, // dance lesson
-    { number: 14, type: 4 }, // select lesson
-    { number: 15, type: 8 }, // trouble
-    { number: 16, type: 6 }, // dance fan
-    { number: 17, type: 3 }, // visual lesson
-    { number: 18, type: 4 }, // select lesson
-    { number: 19, type: 8 }, // trouble
-    { number: 20, type: 9 }, // audition
+    { number: 10, type: 1 }, // vocal lesson
+    { number: 11, type: 5 }, // vocal fan
+    { number: 12, type: 2 }, // dance lesson
+    { number: 13, type: 4 }, // select lesson
+    { number: 14, type: 8 }, // trouble
+    { number: 15, type: 6 }, // dance fan
+    { number: 16, type: 3 }, // visual lesson
+    { number: 17, type: 4 }, // select lesson
+    { number: 18, type: 8 }, // trouble
+    { number: 19, type: 9 }, // audition
 
-    { number: 21, type: 7 }, // visual fan
-    { number: 22, type: 8 }, // trouble
-    { number: 23, type: 4 }, // select lesson
-    { number: 24, type: 5 }, // vocal fan
-    { number: 25, type: 8 }, // trouble
-    { number: 26, type: 6 }, // dance fan
+    { number: 20, type: 7 }, // visual fan
+    { number: 21, type: 8 }, // trouble
+    { number: 22, type: 4 }, // select lesson
+    { number: 23, type: 5 }, // vocal fan
+    { number: 24, type: 8 }, // trouble
+    { number: 25, type: 6 }, // dance fan
+    { number: 26, type: 8 }, // trouble
     { number: 27, type: 8 }, // trouble
-    { number: 28, type: 8 }, // trouble
-    { number: 29, type: 7 }, // visual fan
+    { number: 28, type: 7 }, // visual fan
 
-    { number: 30, type: 11 } // goal
+    { number: 29, type: 11 } // goal
 ];
 
 
@@ -315,7 +315,7 @@ function applyEvent(player, event) {
 
         // トラブル系
         case "leg_injury":
-            changeSkillLevel(player, "adance", -10);
+            changeSkillLevel(player, "dance", -10);
             break;
         case "throat_injury":
             changeSkillLevel(player, "vocal", -10);
