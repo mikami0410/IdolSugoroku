@@ -2,17 +2,17 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
 export enum EventType {
-    VOCAL_LESSON,
-    DANCE_LESSON,
-    VISUAL_LESSON,
-    SELECT_LESSON,
-    VOCAL_FAN,
-    DANCE_FAN,
-    VISUAL_FAN,
-    TROUBLE,
-    AUDITION,
-    START,
-    GOAL
+    VOCAL_LESSON = 1,
+    DANCE_LESSON = 2,
+    VISUAL_LESSON = 3,
+    SELECT_LESSON = 4,
+    VOCAL_FAN = 5,
+    DANCE_FAN = 6,
+    VISUAL_FAN = 7,
+    TROUBLE = 8,
+    AUDITION = 9,
+    START = 10,
+    GOAL = 11
 }
 
 export class Masu {
@@ -113,5 +113,3 @@ export class Masu {
         return this.positionZ;
     }
 }
-
-// 20がオーディション
