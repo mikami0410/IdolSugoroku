@@ -1,5 +1,6 @@
 const {
-  createPlayer
+  createPlayer,
+  getPlayer
 } = require("../player");
 
 const {
@@ -65,6 +66,15 @@ function handleJoin(socket, data, context) {
     return;
   }
 
+  // 開始チェック
+  if (room.gameStarted) {
+    socket.send(JSON.stringify({
+      type: "error",
+      message: "このゲームはすでに開始されたいます"
+    }));
+    return;
+  }
+
   // プレイヤーを作成
   const player = createPlayer(data.name);
   const playerId = player.id;
@@ -87,6 +97,12 @@ function handleJoin(socket, data, context) {
   socket.send(JSON.stringify({
     type: "player_info",
     playerId: playerId
+  }));
+
+  // 参加者本人には、現在のルームメンバー一覧を送信
+  socket.send(JSON.stringify({
+    type: "room_players",
+    players: room.players.map((id) => getPlayer(id))
   }));
 
   // ルーム全員に通知
