@@ -101,8 +101,16 @@ export class Masu {
         return this.eventTitle;
     }
 
+    public setEventTitle(eventTitle: string): void{
+        this.eventTitle = eventTitle;
+    }
+
     public getDiscription(): string {
         return this.description;
+    }
+
+    public setDisctiption(description: string): void {
+        this.description = description;
     }
 
     public getPositionX(): number{
