@@ -11,7 +11,7 @@ export interface ServerPlayerData {
     };
 }
 
-export class Player{
+export class Player {
     private id: number;
     private name: string;
     private fan: number;
@@ -21,7 +21,7 @@ export class Player{
     private masuNumber: number;
     private finished: boolean;
 
-    constructor(name: string = ""){
+    constructor(name: string = "") {
         this.id = 0;
         this.name = name;
         this.fan = 0;
@@ -32,7 +32,7 @@ export class Player{
         this.finished = false;
     }
 
-    public updateFromServer(serverPlayer: ServerPlayerData): void{
+    public updateFromServer(serverPlayer: ServerPlayerData): void {
         this.id = serverPlayer.id;
         this.name = serverPlayer.name;
         this.fan = serverPlayer.fans;
@@ -43,64 +43,77 @@ export class Player{
         this.finished = serverPlayer.finished;
     }
 
-    public getId(): number{
+    public getId(): number {
         return this.id;
     }
 
-    public getName(): string{
+    public getName(): string {
         return this.name;
     }
 
-    public setName(name: string): void{
+    public setName(name: string): void {
         this.name = name;
     }
 
-    public getFan(): number{
+    public getFan(): number {
         return this.fan;
     }
 
-    public setFan(fanNumber: number): void{
+    public setFan(fanNumber: number): void {
         this.fan = fanNumber;
     }
 
-    public getVocal(): number{
+    public getVocal(): number {
         return this.vocal;
     }
 
-    public setVocal(newVocal: number): void{
+    public setVocal(newVocal: number): void {
         this.vocal = newVocal;
     }
 
-    public getDance(): number{
+    public getDance(): number {
         return this.dance;
     }
 
-    public setDance(newDance: number): void{
+    public setDance(newDance: number): void {
         this.dance = newDance;
     }
 
-    public getVisual(): number{
+    public getVisual(): number {
         return this.visual;
     }
 
-    public setVisual(newVisual: number): void{
+    public setVisual(newVisual: number): void {
         this.visual = newVisual;
     }
 
-    public getMasuNumber(): number{
+    public getMasuNumber(): number {
         return this.masuNumber;
     }
 
-    public setMasuNumber(masuNum: number): void{
+    public setMasuNumber(masuNum: number): void {
         this.masuNumber = masuNum;
     }
 
-    public isFinished(): boolean{
+    public isFinished(): boolean {
         return this.finished;
     }
 
-    public setFinished(finished: boolean): void{
+    public setFinished(finished: boolean): void {
         this.finished = finished;
+    }
+
+    public getSkillRank(value: number): string {
+        const ranks = ["C", "B", "A", "S"];
+        if (value >= 100) {
+            return ranks[3]; // Sランク
+        } else if (value >= 67) {
+            return ranks[2]; // Aランク
+        } else if (value >= 34) {
+            return ranks[1]; // Bランク
+        } else {
+            return ranks[0]; // Cランク
+        }
     }
 
 }
