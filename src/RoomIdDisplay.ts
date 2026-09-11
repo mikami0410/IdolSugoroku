@@ -1,4 +1,4 @@
-export class RoomIDDisplay {
+export class RoomIdDisplay {
     private element: HTMLDivElement;
     private input: HTMLInputElement;
     private enterButton: HTMLButtonElement;
