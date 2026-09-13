@@ -367,6 +367,8 @@ function changeFans(player, amount) {
     }
 }
 
+
+// ↓この関数いらなそうだから消す予定
 function getSkillRank(value) {
     const ranks = ["C", "B", "A", "S"];
     if (value >= 100) {
