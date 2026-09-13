@@ -66,15 +66,6 @@ function handleJoin(socket, data, context) {
     return;
   }
 
-  // 開始チェック
-  if (room.gameStarted) {
-    socket.send(JSON.stringify({
-      type: "error",
-      message: "このゲームはすでに開始されたいます"
-    }));
-    return;
-  }
-
   // プレイヤーを作成
   const player = createPlayer(data.name);
   const playerId = player.id;
