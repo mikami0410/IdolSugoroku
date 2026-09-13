@@ -109,7 +109,7 @@ export class Masu {
         return this.description;
     }
 
-    public setDisctiption(description: string): void {
+    public setDiscription(description: string): void {
         this.description = description;
     }
 
