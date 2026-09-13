@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { Masu, EventType } from "./Masu";
-import { masuPosition, eventTypes } from "./Positions";
+import { masuPosition } from "./Positions";
 import { Road } from "./Road";
 import { roadDirection } from "./Positions";
 import { Player } from "./Player";
@@ -17,45 +17,7 @@ import { MatchingDisplay } from "./MatchingDisplay";
 import "./style.css";
 import { RoomIdDisplay } from "./RoomIdDisplay";
 import { PlayerNameDisplay } from "./PlayerNameDisplay";
-
-interface ServerBoardCell {
-    number: number;
-    type: number;
-}
-
-interface GameState {
-    gameStarted: boolean;
-    currentTurn: number;
-    turnOrder: number[];
-    players: ServerPlayerData[];
-}
-
-interface ServerMessage {
-    type: string;
-    playerId?: number;
-    playerName?: string;
-    player?: ServerPlayerData;
-    players?: ServerPlayerData[];
-    playerIds?: number[];
-    turnOrder?: number[];
-    state?: GameState;
-    board?: ServerBoardCell[];
-    value?: number;
-    position?: number;
-    cell?: ServerBoardCell;
-    event?: {
-        name: string | null;
-        title: string | null;
-        description: string | null;
-    };
-    ranking?: Array<{
-        playerId: number;
-        playerName: string;
-        fans: number;
-        rank: number;
-    }>;
-    message?: string;
-}
+import { ServerBoardCell, GameState, ServerMessage} from "./GameTypes";
 
 const socket = new WebSocket("ws://localhost:8080");
 
@@ -73,7 +35,6 @@ let boardCreated = false;
 
 // コマ
 const komas: Map<number, Koma> = new Map();
-
 const komaOffsets: PositionOffset[] = [
     PositionOffset.UPPER_LEFT,
     PositionOffset.UPPER_RIGHT,
@@ -91,10 +52,9 @@ let descriptionDisplay!: DescriptionDisplay;
 let roulette!: Roulette;
 let rouletteDisplay!: RouletteDisplay;
 let scene!: THREE.Scene;
-let rouletteButtonElement!: HTMLButtonElement;
 let pendingCellEventData: ServerMessage | null = null;
-let serverDeme!: number;
 let currentPlayer!: Player;
+let rouletteButton!: RouletteButton;
 
 function sendMessage(message: object): void {
     if (socket.readyState !== WebSocket.OPEN) {
@@ -115,12 +75,14 @@ socket.addEventListener("message", (event) => {
                 console.log("自分のplayerId:", myPlayerId);
             }
             break;
+
         case "player_joined":
             if (data.player) {
                 addOrUpdatePlayer(data.player);
                 updateMatchingDisplay();
             }
             break;
+
         case "room_players":
             if (data.players) {
                 for (const player of data.players) {
@@ -130,6 +92,7 @@ socket.addEventListener("message", (event) => {
                 matchingDisplay.show();
             }
             break;
+
         case "board":
             if (data.board) {
                 createBoardFromServer(data.board);
@@ -140,26 +103,28 @@ socket.addEventListener("message", (event) => {
                 positionNumber++;
             }
             break;
+
         case "game_state":
             if (data.state) {
                 updateGameState(data.state);
             }
             break;
+
         case "order_deciding":
             console.log("順番決定中");
             break;
+
         case "order_decided":
             console.log("ターン順：", data.turnOrder ?? data.playerIds);
             break;
+
         case "turn_changed":
             if (data.playerId !== undefined) {
                 currentTurn = data.playerId;
                 const player = players.get(currentTurn);
-
                 if (player) {
                     currentPlayer = player;
                 }
-                
                 if (!isInitialStatusDisplayed) {
                     statusDisplay.show(currentPlayer);
                     isInitialStatusDisplayed = true;
@@ -167,6 +132,7 @@ socket.addEventListener("message", (event) => {
                 updateRouletteButton();
             }
             break;
+
         case "roulette_result":
             if (
                 data.playerId !== undefined &&
@@ -184,6 +150,7 @@ socket.addEventListener("message", (event) => {
                 handlePlayerSet(data.playerId, data.position);
             }
             break;
+
         case "cell_event":
             pendingCellEventData = data;
             break;
@@ -334,12 +301,11 @@ function moveKoma(palyerId: number, value: number) {
         rouletteDisplay.hide();
         descriptionDisplay.show(nextMasu);
     }, (value + 1) * 1000);
-
 }
 
 function handleRouletteResult(playerId: number, value: number): void {
     console.log("サーバーが決めた出目：", value);
-    serverDeme = value;
+    const serverDeme = value;
 
     descriptionDisplay.hide();
 
@@ -357,7 +323,7 @@ function handleRouletteResult(playerId: number, value: number): void {
         setTimeout(() => {
             descriptionDisplay.hide();
             statusDisplay.show(currentPlayer);
-        }, (value + 1) * 1000 + 3000);
+        }, (value + 1) * 1000 + 3500);
     })
     roulette.startRolling();
 }
@@ -386,8 +352,6 @@ function handleCellEvent(data: ServerMessage): void {
     }
 
     console.log("マスイベント：", data.event);
-    // rouletteDisplay.hide();
-    // descriptionDisplay.show(masu);
 }
 
 function updateMatchingDisplay(): void {
@@ -395,12 +359,7 @@ function updateMatchingDisplay(): void {
 }
 
 function createRouletteButton(): void {
-    rouletteButtonElement = document.createElement("button");
-    rouletteButtonElement.id = "roulette-button";
-    rouletteButtonElement.textContent = "ルーレットを回す";
-    gameContainer.appendChild(rouletteButtonElement);
-
-    rouletteButtonElement.addEventListener("click", () => {
+    rouletteButton = new RouletteButton(() => {
         if (myPlayerId === null) {
             return;
         }
@@ -422,14 +381,16 @@ function createRouletteButton(): void {
 }
 
 function updateRouletteButton(): void {
-    if (!rouletteButtonElement) {
+    if (!rouletteButton) {
         return;
     }
 
-    rouletteButtonElement.disabled =
+    const disabled =
         myPlayerId === null ||
         currentTurn !== myPlayerId ||
         roulette.getIsRolling();
+
+    rouletteButton.setDisabled(disabled);
 }
 
 function startGame(): void {
