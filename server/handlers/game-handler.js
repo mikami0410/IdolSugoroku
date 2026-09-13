@@ -14,6 +14,11 @@ const {
   getPlayer
 } = require("../player");
 
+const {
+  board
+} = require("../game-system")
+
+
 // ゲーム開始処理
 function handleStartGame({
   socket,
@@ -70,6 +75,12 @@ function handleStartGame({
 
   // 最初のターンを設定
   room.currentTurn = room.turnOrder[0];
+
+  // ボードを開始時に一回だけ送信する
+  broadcastToRoom(roomId, {
+    type: "board",
+    board: board
+  })
 
   // ゲーム状態を全プレイヤーに通知
   broadcastToRoom(roomId, {
