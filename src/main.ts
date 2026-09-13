@@ -155,6 +155,9 @@ socket.addEventListener("message", (event) => {
             pendingCellEventData = data;
             break;
 
+        case "audition_start":
+            // 後で決める
+
         case "game_finished":
             console.log("ゲーム終了:", data.ranking);
             break;
@@ -317,6 +320,7 @@ function handleRouletteResult(playerId: number, value: number): void {
             handleCellEvent(pendingCellEventData);
             pendingCellEventData = null;
         }
+
         updateRouletteButton();
         moveKoma(playerId, value);
 
