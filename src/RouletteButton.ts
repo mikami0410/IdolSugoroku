@@ -15,7 +15,8 @@ export class RouletteButton{
             if(roulette.getIsRolling()){
                 return;
             }
-            roulette.roll()
+            // roulette.roll()
+            
         });
     }
 }

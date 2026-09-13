@@ -34,7 +34,7 @@ export const masuPosition: [number, number][] =[
     [17, -8]
 ];
 
-// マスの内容
+// マスの内容 後で消す
 export const eventTypes: EventType[] = [
     EventType.START,
 
