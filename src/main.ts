@@ -62,6 +62,7 @@ const socket = new WebSocket("ws://localhost:8080");
 let myPlayerId: number | null = null;
 let currentRoomId = "";
 let currentTurn: number | null = null;
+let isInitialStatusDisplayed = false;
 
 // プレイヤーの情報を保持するマップ
 const players: Map<number, Player> = new Map();
@@ -136,7 +137,7 @@ socket.addEventListener("message", (event) => {
             let positionNumber = 1;
             for (const player of players.values()) {
                 createKoma(player.getId(), positionNumber);
-                positionNumber ++;
+                positionNumber++;
             }
             break;
         case "game_state":
@@ -153,12 +154,15 @@ socket.addEventListener("message", (event) => {
         case "turn_changed":
             if (data.playerId !== undefined) {
                 currentTurn = data.playerId;
-                // players.get(currentTurn)の位置を変えると良いかも
                 const player = players.get(currentTurn);
+
                 if (player) {
                     currentPlayer = player;
-                    // statusDisplay.show()の位置を変更する
-                    // statusDisplay.show(currentPlayer);
+                }
+                
+                if (!isInitialStatusDisplayed) {
+                    statusDisplay.show(currentPlayer);
+                    isInitialStatusDisplayed = true;
                 }
                 updateRouletteButton();
             }
@@ -219,14 +223,7 @@ function updateGameState(state: GameState): void {
 
     for (const serverPlayer of state.players) {
         addOrUpdatePlayer(serverPlayer);
-        
-    }
 
-    // updateRouletteButton();
-
-    const currentPlayer = players.get(currentTurn);
-    if (currentPlayer) {
-        // statusDisplay.show(currentPlayer);
     }
 }
 
@@ -304,71 +301,40 @@ function handlePlayerSet(playerId: number, position: number): void {
     player.setMasuNumber(position);
 }
 
-function moveKoma(playerId: number): void {
-    const player = players.get(playerId);
-    const koma = komas.get(playerId);
-
-    if (!koma || !player) {
-        return;
-    }
-
-    const masu = masus[player.getMasuNumber()];
-
-    if (!masu) {
-        return;
-    }
-
-    // roulette.setRollingEnd(() => {
-    //     koma.setPosition(masu);
-    // })
-
-    koma.setPosition(masu);
-}
-
-function moveKoma2(palyerId: number, value: number) {
+function moveKoma(palyerId: number, value: number) {
     const player = players.get(palyerId);
     const koma = komas.get(palyerId);
-    let nextPlayer = null;
 
-    if(currentTurn !== null) {
-        nextPlayer = players.get(currentTurn);
-    }
-
-    if(!player || !koma || !nextPlayer) {
+    if (!player || !koma) {
         return;
     }
 
-    //この時点でMasuNumberが変更されているかどうかでかわりそう
     const nextMasuNumber = player.getMasuNumber();
     let currentMasuNumber = nextMasuNumber - value;
     const nextMasu = masus[nextMasuNumber];
 
-    if(!nextMasu) {
+    if (!nextMasu) {
         return;
     }
 
     for (let i = 0; i < value; i++) {
         setTimeout(() => {
-            if(currentMasuNumber < nextMasuNumber) {
-                currentMasuNumber ++;
+            if (currentMasuNumber < nextMasuNumber) {
+                currentMasuNumber++;
                 let currentMasu = masus[currentMasuNumber];
-                if(!currentMasu) {
+                if (!currentMasu) {
                     return;
                 }
                 koma.setPosition(currentMasu);
             }
-        }, 1000*(i+1));
+        }, 1000 * (i + 1));
     }
     setTimeout(() => {
         player.setMasuNumber(nextMasuNumber);
         rouletteDisplay.hide();
         descriptionDisplay.show(nextMasu);
-    }, (value+1)*1000);
+    }, (value + 1) * 1000);
 
-    setTimeout(() => {
-        descriptionDisplay.hide();
-        statusDisplay.show(nextPlayer);
-    }, (value+1)*1000 + 3000);
 }
 
 function handleRouletteResult(playerId: number, value: number): void {
@@ -386,7 +352,12 @@ function handleRouletteResult(playerId: number, value: number): void {
             pendingCellEventData = null;
         }
         updateRouletteButton();
-        moveKoma2(playerId, value);
+        moveKoma(playerId, value);
+
+        setTimeout(() => {
+            descriptionDisplay.hide();
+            statusDisplay.show(currentPlayer);
+        }, (value + 1) * 1000 + 3000);
     })
     roulette.startRolling();
 }
