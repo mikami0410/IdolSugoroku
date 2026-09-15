@@ -69,6 +69,16 @@ export class MatchingDisplay {
         this.playerNameElements[playerNumber].textContent = playerName;
     }
 
+    public setPlayers(players: Player[]): void {
+        for (let i = 0; i < this.playerNameElements.length; i++) {
+            this.playerNameElements[i].textContent = "????";
+        }
+
+        for (let i = 0; i < players.length && i < 4; i++) {
+            this.playerNameElements[i].textContent = players[i].getName();
+        }
+    }
+
     public show(): void {
         this.element.style.display = "flex";
     }

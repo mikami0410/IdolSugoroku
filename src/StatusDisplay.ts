@@ -14,6 +14,7 @@ export class StatusDisplay{
         this.hide();
     }
 
+    // privateでもいいかも
     public judgeRank(status: number): string{
         if(status <= 33){
             return "C";
@@ -47,13 +48,13 @@ export class StatusDisplay{
                     </span>
                 </span>
                 <span>
-                    vocal：
+                    dance：
                     <span class="rank rank-${danceRank}">
                         ${danceRank}
                     </span>
                 </span>
                 <span>
-                    vocal：
+                    visual：
                     <span class="rank rank-${visualRank}">
                         ${visualRank}
                     </span>

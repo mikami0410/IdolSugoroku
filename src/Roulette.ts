@@ -74,7 +74,9 @@ export class Roulette {
             if (progress < 1) {
                 requestAnimationFrame(animate);
             } else {
+                this.isRollong = false;
                 console.log(this.deme);
+                
                 if(this.rollingEnd){
                     this.rollingEnd(this.deme);
                 }

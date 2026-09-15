@@ -340,7 +340,7 @@ function applyEvent(player, event) {
 
 // ファンの数決め
 function calculateFans(skill) {
-    const fans = Math.floor(skill * 0.5);
+    const fans = Math.floor((skill + 10) / 2);
     return fans;
 }
 
@@ -367,6 +367,8 @@ function changeFans(player, amount) {
     }
 }
 
+
+// ↓この関数いらなそうだから消す予定
 function getSkillRank(value) {
     const ranks = ["C", "B", "A", "S"];
     if (value >= 100) {

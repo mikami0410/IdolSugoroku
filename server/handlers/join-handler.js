@@ -1,5 +1,6 @@
 const {
-  createPlayer
+  createPlayer,
+  getPlayer
 } = require("../player");
 
 const {
@@ -87,6 +88,12 @@ function handleJoin(socket, data, context) {
   socket.send(JSON.stringify({
     type: "player_info",
     playerId: playerId
+  }));
+
+  // 参加者本人には、現在のルームメンバー一覧を送信
+  socket.send(JSON.stringify({
+    type: "room_players",
+    players: room.players.map((id) => getPlayer(id))
   }));
 
   // ルーム全員に通知

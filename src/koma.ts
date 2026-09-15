@@ -14,6 +14,7 @@ export class Koma {
     private positionOffset: PositionOffset;
     private offSetX!: number;
     private offSetZ!: number;
+    private isLoaded: boolean = false;
 
     constructor(position: PositionOffset) {
         this.positionOffset = position;
@@ -38,6 +39,9 @@ export class Koma {
     }
 
     public async load(scene: THREE.Scene, masu: Masu): Promise<void> {
+        if (this.isLoaded) {
+            return;
+        }
         const loder = new GLTFLoader();
         const gltf = await new Promise<any>((resolve, reject) => {
             loder.load("models/koma.glb", resolve, undefined, reject);
@@ -55,7 +59,7 @@ export class Koma {
                 color = new THREE.Color(0xdd88cc);
                 break;
             case PositionOffset.LOWER_RIGHT:
-                color = new THREE.Color(0x11cccee);
+                color = new THREE.Color(0x11ccee);
                 break;
         }
         this.koma.traverse((child) => {
@@ -67,6 +71,7 @@ export class Koma {
         this.koma.scale.set(7, 7, 7);
         this.koma.position.set(masu.getPositionX() + this.offSetX, 0.2, masu.getPositionZ() + this.offSetZ);
         scene.add(this.koma);
+        this.isLoaded = true;
     }
 
     public setPosition(masu: Masu): void {
